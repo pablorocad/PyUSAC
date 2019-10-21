@@ -52,6 +52,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analisis\graficarArbol.cs" />
+    <Compile Include="Analisis\Gramatica.cs" />
+    <Compile Include="Analisis\Sintactico.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

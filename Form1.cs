@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PyUSAC.Analisis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -95,8 +96,22 @@ namespace PyUSAC
 
         private void BtnCompilar_Click(object sender, EventArgs e)
         {
-            //TextBox temp = AreaEdicion.SelectedTab.Controls[0] as TextBox;
-           AreaReportes.SelectTab("Consola");
+            TextBox temp = AreaEdicion.SelectedTab.Controls[0] as TextBox;
+            Sintactico analisis = new Sintactico();
+
+            bool result = analisis.Analizar(temp.Text);
+            AreaReportes.SelectTab("Consola");
+
+            if (result)
+            {
+                (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "Cadena correcta";
+            }
+            else
+            {
+                (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "Cadena incorrecta";
+            }
+
+           //AreaReportes.SelectTab("Consola");
         }
     }
 }
