@@ -38,7 +38,7 @@
             this.btnCompilar = new System.Windows.Forms.ToolStripMenuItem();
             this.AreaReportes = new System.Windows.Forms.TabControl();
             this.AreaEdicion = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.Consola = new System.Windows.Forms.TabPage();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tablaErrores = new System.Windows.Forms.DataGridView();
@@ -46,10 +46,11 @@
             this.Descripcion = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Fila = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Columna = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnAbrir = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.AreaReportes.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.Consola.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).BeginInit();
             this.SuspendLayout();
@@ -79,6 +80,7 @@
             // 
             this.archivoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnCrearArchivo,
+            this.btnAbrir,
             this.btnGuardar,
             this.btnGuardarComo,
             this.btnCerrar});
@@ -98,6 +100,7 @@
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(180, 22);
             this.btnGuardar.Text = "Guardar archivo";
+            this.btnGuardar.Click += new System.EventHandler(this.BtnGuardar_Click);
             // 
             // btnGuardarComo
             // 
@@ -110,16 +113,18 @@
             this.btnCerrar.Name = "btnCerrar";
             this.btnCerrar.Size = new System.Drawing.Size(180, 22);
             this.btnCerrar.Text = "Cerrar archivo";
+            this.btnCerrar.Click += new System.EventHandler(this.BtnCerrar_Click);
             // 
             // btnCompilar
             // 
             this.btnCompilar.Name = "btnCompilar";
             this.btnCompilar.Size = new System.Drawing.Size(68, 20);
             this.btnCompilar.Text = "Compilar";
+            this.btnCompilar.Click += new System.EventHandler(this.BtnCompilar_Click);
             // 
             // AreaReportes
             // 
-            this.AreaReportes.Controls.Add(this.tabPage1);
+            this.AreaReportes.Controls.Add(this.Consola);
             this.AreaReportes.Controls.Add(this.tabPage2);
             this.AreaReportes.Location = new System.Drawing.Point(11, 398);
             this.AreaReportes.Name = "AreaReportes";
@@ -135,16 +140,16 @@
             this.AreaEdicion.Size = new System.Drawing.Size(735, 339);
             this.AreaEdicion.TabIndex = 1;
             // 
-            // tabPage1
+            // Consola
             // 
-            this.tabPage1.Controls.Add(this.textBox1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(727, 237);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Consola";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.Consola.Controls.Add(this.textBox1);
+            this.Consola.Location = new System.Drawing.Point(4, 22);
+            this.Consola.Name = "Consola";
+            this.Consola.Padding = new System.Windows.Forms.Padding(3);
+            this.Consola.Size = new System.Drawing.Size(727, 237);
+            this.Consola.TabIndex = 0;
+            this.Consola.Text = "Consola";
+            this.Consola.UseVisualStyleBackColor = true;
             // 
             // textBox1
             // 
@@ -210,6 +215,13 @@
             this.Columna.Name = "Columna";
             this.Columna.ReadOnly = true;
             // 
+            // btnAbrir
+            // 
+            this.btnAbrir.Name = "btnAbrir";
+            this.btnAbrir.Size = new System.Drawing.Size(180, 22);
+            this.btnAbrir.Text = "Abrir archivo";
+            this.btnAbrir.Click += new System.EventHandler(this.BtnAbrir_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -224,8 +236,8 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.AreaReportes.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
+            this.Consola.ResumeLayout(false);
+            this.Consola.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).EndInit();
             this.ResumeLayout(false);
@@ -244,7 +256,7 @@
         private System.Windows.Forms.ToolStripMenuItem btnCompilar;
         private System.Windows.Forms.TabControl AreaReportes;
         private System.Windows.Forms.TabControl AreaEdicion;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage Consola;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView tablaErrores;
@@ -252,6 +264,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Descripcion;
         private System.Windows.Forms.DataGridViewTextBoxColumn Fila;
         private System.Windows.Forms.DataGridViewTextBoxColumn Columna;
+        private System.Windows.Forms.ToolStripMenuItem btnAbrir;
     }
 }
 
