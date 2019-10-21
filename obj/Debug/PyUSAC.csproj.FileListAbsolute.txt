@@ -1,0 +1,15 @@
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\PyUSAC.exe.config
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\PyUSAC.exe
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\PyUSAC.pdb
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\Irony.dll
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\Irony.Interpreter.dll
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\Irony.pdb
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\bin\Debug\Irony.Interpreter.pdb
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.csprojAssemblyReference.cache
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.Form1.resources
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.Properties.Resources.resources
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.csproj.GenerateResource.cache
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.csproj.CoreCompileInputs.cache
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.csproj.CopyComplete
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.exe
+C:\Users\lpabl\OneDrive\Documentos\Visual Studio projects\C#\PyUSAC\PyUSAC\obj\Debug\PyUSAC.pdb
