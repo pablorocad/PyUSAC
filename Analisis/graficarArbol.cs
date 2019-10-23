@@ -17,7 +17,7 @@ namespace PyUSAC.Analisis
         public static String textoGraphviz(ParseTreeNode temp)
         {
             grafo = "digraph AST{ \r\n";
-            grafo += "nodo0[label=\"" + temp.Term.ToString() + "\"];\r\n";
+            grafo += "nodo0[label=\"" + temp.ToString() + "\"];\r\n";
             contador = 1;
             recorrerAST("nodo0", temp);
             grafo += "}";

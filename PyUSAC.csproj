@@ -55,12 +55,19 @@
     <Compile Include="Analisis\graficarArbol.cs" />
     <Compile Include="Analisis\Gramatica.cs" />
     <Compile Include="Analisis\Sintactico.cs" />
+    <Compile Include="Clases\Entorno.cs" />
+    <Compile Include="Clases\Error.cs" />
+    <Compile Include="Clases\Expresion.cs" />
+    <Compile Include="Clases\Simbolo.cs" />
+    <Compile Include="Clases\Tipo.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Instrucciones\Log.cs" />
+    <Compile Include="Interfaces\Instruccion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -88,5 +95,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,6 @@
 ﻿using PyUSAC.Analisis;
+using PyUSAC.Clases;
+using PyUSAC.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +17,8 @@ namespace PyUSAC
 {
     public partial class Form1 : Form
     {
+        
+
         public Form1()
         {
             InitializeComponent();
@@ -102,14 +106,23 @@ namespace PyUSAC
             bool result = analisis.Analizar(temp.Text);
             AreaReportes.SelectTab("Consola");
 
+            (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "";
+
             if (result)
             {
-                (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "Cadena correcta";
+                //(AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "Cadena correcta";
+                foreach (String s in Sintactico.listaImp)
+                {
+                    (AreaReportes.SelectedTab.Controls[0] as TextBox).Text =
+                        (AreaReportes.SelectedTab.Controls[0] as TextBox).Text + s + "\r\n";
+                }
             }
             else
             {
                 (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "Cadena incorrecta";
             }
+
+            
 
            //AreaReportes.SelectTab("Consola");
         }

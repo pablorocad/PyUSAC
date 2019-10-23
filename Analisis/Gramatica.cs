@@ -15,7 +15,7 @@ namespace PyUSAC.Analisis
         {
             #region Expresiones Regulares
             //COMENTARIOS----------------------------------------------------------------
-            CommentTerminal comentarioLinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n");
+            CommentTerminal comentarioLinea = new CommentTerminal("comentarioLinea", "//", "\r\n");
             CommentTerminal comentarioMulti = new CommentTerminal("comentarioMulti", "/*", "*/");
             NonGrammarTerminals.Add(comentarioLinea);
             NonGrammarTerminals.Add(comentarioMulti);
@@ -23,12 +23,16 @@ namespace PyUSAC.Analisis
             //Expresiones----------------------------------------------------------------
             NumberLiteral numero = new NumberLiteral("numero");
             StringLiteral cadena = new StringLiteral("cadena", "\"");
+            StringLiteral caracter = TerminalFactory.CreateCSharpChar("caracter");//Chars
             IdentifierTerminal identificador = new IdentifierTerminal("identificador");
             #endregion
 
             #region Terminales
             //Palabras reservadas--------------------------------------------------------
             var rvar = ToTerm("var");
+            var rtrue = ToTerm("true");
+            var rfalse = ToTerm("false");
+            var rlog = ToTerm("log");
 
 
             //Simbolos-------------------------------------------------------------------
@@ -55,7 +59,11 @@ namespace PyUSAC.Analisis
                 S = new NonTerminal("S"),
                 L_INS = new NonTerminal("L_INS"),
                 INS = new NonTerminal("INS"),
+
+
                 DECLARACION = new NonTerminal("DECLARACION"),
+                LOG = new NonTerminal("LOG"),
+
                 L_ID = new NonTerminal("L_ID"),
                 ZI = new NonTerminal("ZI"),
                 E = new NonTerminal("E");
@@ -76,6 +84,7 @@ namespace PyUSAC.Analisis
                         ;
 
             INS.Rule = DECLARACION
+                      | LOG
                 ;
 
             DECLARACION.Rule = rvar + L_ID + ZI + puntocoma
@@ -89,15 +98,22 @@ namespace PyUSAC.Analisis
                     | Empty
                     ;
 
+            LOG.Rule = rlog + parizq + E + parder + puntocoma
+                ;
+
             E.Rule = E + mas + E
                     | E + menos + E
                     | E + multi + E
                     | E + div + E
                     | E + potencia + E
                     | parizq + E + parder
+                    | menos + E
                     | numero
                     | cadena
                     | identificador
+                    | caracter
+                    | rtrue
+                    | rfalse
                     ;
             #endregion
 

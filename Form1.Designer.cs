@@ -29,15 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.archivoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnCrearArchivo = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnGuardar = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnGuardarComo = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnCerrar = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnCompilar = new System.Windows.Forms.ToolStripMenuItem();
             this.AreaReportes = new System.Windows.Forms.TabControl();
-            this.AreaEdicion = new System.Windows.Forms.TabControl();
             this.Consola = new System.Windows.Forms.TabPage();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -46,13 +38,21 @@
             this.Descripcion = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Fila = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Columna = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.AreaEdicion = new System.Windows.Forms.TabControl();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.archivoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnCrearArchivo = new System.Windows.Forms.ToolStripMenuItem();
             this.btnAbrir = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnGuardar = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnGuardarComo = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnCerrar = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnCompilar = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
             this.AreaReportes.SuspendLayout();
             this.Consola.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -65,63 +65,6 @@
             this.panel1.Size = new System.Drawing.Size(756, 674);
             this.panel1.TabIndex = 0;
             // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.archivoToolStripMenuItem,
-            this.btnCompilar});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(756, 24);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // archivoToolStripMenuItem
-            // 
-            this.archivoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnCrearArchivo,
-            this.btnAbrir,
-            this.btnGuardar,
-            this.btnGuardarComo,
-            this.btnCerrar});
-            this.archivoToolStripMenuItem.Name = "archivoToolStripMenuItem";
-            this.archivoToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
-            this.archivoToolStripMenuItem.Text = "Archivo";
-            // 
-            // btnCrearArchivo
-            // 
-            this.btnCrearArchivo.Name = "btnCrearArchivo";
-            this.btnCrearArchivo.Size = new System.Drawing.Size(180, 22);
-            this.btnCrearArchivo.Text = "Crear archivo";
-            this.btnCrearArchivo.Click += new System.EventHandler(this.BtnCrearArchivo_Click);
-            // 
-            // btnGuardar
-            // 
-            this.btnGuardar.Name = "btnGuardar";
-            this.btnGuardar.Size = new System.Drawing.Size(180, 22);
-            this.btnGuardar.Text = "Guardar archivo";
-            this.btnGuardar.Click += new System.EventHandler(this.BtnGuardar_Click);
-            // 
-            // btnGuardarComo
-            // 
-            this.btnGuardarComo.Name = "btnGuardarComo";
-            this.btnGuardarComo.Size = new System.Drawing.Size(180, 22);
-            this.btnGuardarComo.Text = "Guardar como...";
-            // 
-            // btnCerrar
-            // 
-            this.btnCerrar.Name = "btnCerrar";
-            this.btnCerrar.Size = new System.Drawing.Size(180, 22);
-            this.btnCerrar.Text = "Cerrar archivo";
-            this.btnCerrar.Click += new System.EventHandler(this.BtnCerrar_Click);
-            // 
-            // btnCompilar
-            // 
-            this.btnCompilar.Name = "btnCompilar";
-            this.btnCompilar.Size = new System.Drawing.Size(68, 20);
-            this.btnCompilar.Text = "Compilar";
-            this.btnCompilar.Click += new System.EventHandler(this.BtnCompilar_Click);
-            // 
             // AreaReportes
             // 
             this.AreaReportes.Controls.Add(this.Consola);
@@ -131,14 +74,6 @@
             this.AreaReportes.SelectedIndex = 0;
             this.AreaReportes.Size = new System.Drawing.Size(735, 263);
             this.AreaReportes.TabIndex = 2;
-            // 
-            // AreaEdicion
-            // 
-            this.AreaEdicion.Location = new System.Drawing.Point(11, 40);
-            this.AreaEdicion.Name = "AreaEdicion";
-            this.AreaEdicion.SelectedIndex = 0;
-            this.AreaEdicion.Size = new System.Drawing.Size(735, 339);
-            this.AreaEdicion.TabIndex = 1;
             // 
             // Consola
             // 
@@ -215,12 +150,77 @@
             this.Columna.Name = "Columna";
             this.Columna.ReadOnly = true;
             // 
+            // AreaEdicion
+            // 
+            this.AreaEdicion.Location = new System.Drawing.Point(11, 40);
+            this.AreaEdicion.Name = "AreaEdicion";
+            this.AreaEdicion.SelectedIndex = 0;
+            this.AreaEdicion.Size = new System.Drawing.Size(735, 339);
+            this.AreaEdicion.TabIndex = 1;
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.archivoToolStripMenuItem,
+            this.btnCompilar});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(756, 24);
+            this.menuStrip1.TabIndex = 0;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // archivoToolStripMenuItem
+            // 
+            this.archivoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnCrearArchivo,
+            this.btnAbrir,
+            this.btnGuardar,
+            this.btnGuardarComo,
+            this.btnCerrar});
+            this.archivoToolStripMenuItem.Name = "archivoToolStripMenuItem";
+            this.archivoToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
+            this.archivoToolStripMenuItem.Text = "Archivo";
+            // 
+            // btnCrearArchivo
+            // 
+            this.btnCrearArchivo.Name = "btnCrearArchivo";
+            this.btnCrearArchivo.Size = new System.Drawing.Size(159, 22);
+            this.btnCrearArchivo.Text = "Crear archivo";
+            this.btnCrearArchivo.Click += new System.EventHandler(this.BtnCrearArchivo_Click);
+            // 
             // btnAbrir
             // 
             this.btnAbrir.Name = "btnAbrir";
-            this.btnAbrir.Size = new System.Drawing.Size(180, 22);
+            this.btnAbrir.Size = new System.Drawing.Size(159, 22);
             this.btnAbrir.Text = "Abrir archivo";
             this.btnAbrir.Click += new System.EventHandler(this.BtnAbrir_Click);
+            // 
+            // btnGuardar
+            // 
+            this.btnGuardar.Name = "btnGuardar";
+            this.btnGuardar.Size = new System.Drawing.Size(159, 22);
+            this.btnGuardar.Text = "Guardar archivo";
+            this.btnGuardar.Click += new System.EventHandler(this.BtnGuardar_Click);
+            // 
+            // btnGuardarComo
+            // 
+            this.btnGuardarComo.Name = "btnGuardarComo";
+            this.btnGuardarComo.Size = new System.Drawing.Size(159, 22);
+            this.btnGuardarComo.Text = "Guardar como...";
+            // 
+            // btnCerrar
+            // 
+            this.btnCerrar.Name = "btnCerrar";
+            this.btnCerrar.Size = new System.Drawing.Size(159, 22);
+            this.btnCerrar.Text = "Cerrar archivo";
+            this.btnCerrar.Click += new System.EventHandler(this.BtnCerrar_Click);
+            // 
+            // btnCompilar
+            // 
+            this.btnCompilar.Name = "btnCompilar";
+            this.btnCompilar.Size = new System.Drawing.Size(68, 20);
+            this.btnCompilar.Text = "Compilar";
+            this.btnCompilar.Click += new System.EventHandler(this.BtnCompilar_Click);
             // 
             // Form1
             // 
@@ -233,13 +233,13 @@
             this.Text = "PyUSAC";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.AreaReportes.ResumeLayout(false);
             this.Consola.ResumeLayout(false);
             this.Consola.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -254,7 +254,6 @@
         private System.Windows.Forms.ToolStripMenuItem btnGuardarComo;
         private System.Windows.Forms.ToolStripMenuItem btnCerrar;
         private System.Windows.Forms.ToolStripMenuItem btnCompilar;
-        private System.Windows.Forms.TabControl AreaReportes;
         private System.Windows.Forms.TabControl AreaEdicion;
         private System.Windows.Forms.TabPage Consola;
         private System.Windows.Forms.TextBox textBox1;
@@ -265,6 +264,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Fila;
         private System.Windows.Forms.DataGridViewTextBoxColumn Columna;
         private System.Windows.Forms.ToolStripMenuItem btnAbrir;
+        public System.Windows.Forms.TabControl AreaReportes;
     }
 }
 
