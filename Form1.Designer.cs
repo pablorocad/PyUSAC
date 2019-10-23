@@ -47,6 +47,7 @@
             this.btnGuardarComo = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCerrar = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCompilar = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnGenerar = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             this.AreaReportes.SuspendLayout();
             this.Consola.SuspendLayout();
@@ -162,7 +163,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.archivoToolStripMenuItem,
-            this.btnCompilar});
+            this.btnCompilar,
+            this.btnGenerar});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(756, 24);
@@ -222,6 +224,13 @@
             this.btnCompilar.Text = "Compilar";
             this.btnCompilar.Click += new System.EventHandler(this.BtnCompilar_Click);
             // 
+            // btnGenerar
+            // 
+            this.btnGenerar.Name = "btnGenerar";
+            this.btnGenerar.Size = new System.Drawing.Size(92, 20);
+            this.btnGenerar.Text = "Generar Arbol";
+            this.btnGenerar.Click += new System.EventHandler(this.BtnGenerar_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -265,6 +274,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Columna;
         private System.Windows.Forms.ToolStripMenuItem btnAbrir;
         public System.Windows.Forms.TabControl AreaReportes;
+        private System.Windows.Forms.ToolStripMenuItem btnGenerar;
     }
 }
 

@@ -31,7 +31,7 @@ namespace PyUSAC.Analisis
             return listaIns;
         }
 
-        public bool Analizar(String cadena)
+        public bool Analizar(String cadena, int n)
         {
             Gramatica gramatica = new Gramatica();
             LanguageData lenguaje = new LanguageData(gramatica);
@@ -39,8 +39,21 @@ namespace PyUSAC.Analisis
             ParseTree arbolAST = parser.Parse(cadena);
             ParseTreeNode raiz = arbolAST.Root;
 
-            generarArbol(raiz);
-            ejecutarArbol(raiz);
+            if (n == 0)
+            {
+                generarArbol(raiz);
+            }
+            else if(n == 8200)
+            {
+                try
+                {
+                    ejecutarArbol(raiz);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
 
             if (raiz != null)
             {
@@ -165,8 +178,13 @@ namespace PyUSAC.Analisis
                     return null;
 
                 case "LOG":
-                    Expresion expLog = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
-                    return new Log(expLog);
+                    Expresion expLog = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);//Resolver la expresion
+                    return new Log(expLog);//Retornar instruccion Log
+
+                case "ALERT":
+                    Expresion expAlert = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);//Resolver la expresion
+                    return new Alert(expAlert);
+                    break;
             }
             return null;
         }
@@ -215,6 +233,8 @@ namespace PyUSAC.Analisis
                             else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
                             {
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) + Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
@@ -222,6 +242,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo2.getValor().ToString());
 
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) + car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
@@ -229,6 +251,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo1.getValor().ToString());
 
                                 nuevoValor = Double.Parse(hijo2.getValor().ToString()) + car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else
@@ -247,6 +271,8 @@ namespace PyUSAC.Analisis
                             if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
                             {
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) - Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
@@ -254,6 +280,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo2.getValor().ToString());
 
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) - car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
@@ -261,6 +289,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo1.getValor().ToString());
 
                                 nuevoValor = car - Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else
@@ -279,6 +309,8 @@ namespace PyUSAC.Analisis
                             if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
                             {
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) * Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
@@ -286,6 +318,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo2.getValor().ToString());
 
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) * car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
@@ -293,6 +327,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo1.getValor().ToString());
 
                                 nuevoValor = Double.Parse(hijo2.getValor().ToString()) * car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else
@@ -311,6 +347,8 @@ namespace PyUSAC.Analisis
                             if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
                             {
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) / Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
@@ -318,6 +356,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo2.getValor().ToString());
 
                                 nuevoValor = Double.Parse(hijo1.getValor().ToString()) / car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
@@ -325,6 +365,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo1.getValor().ToString());
 
                                 nuevoValor = car / Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else
@@ -343,6 +385,8 @@ namespace PyUSAC.Analisis
                             if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
                             {
                                 nuevoValor = Math.Pow(Double.Parse(hijo1.getValor().ToString()), Double.Parse(hijo2.getValor().ToString()));
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
@@ -350,6 +394,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo2.getValor().ToString());
 
                                 nuevoValor = Math.Pow(Double.Parse(hijo1.getValor().ToString()),car);
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
@@ -357,6 +403,8 @@ namespace PyUSAC.Analisis
                                 double car = Convert.ToChar(hijo1.getValor().ToString());
 
                                 nuevoValor = Math.Pow(car,Double.Parse(hijo2.getValor().ToString()));
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
                                 return new Expresion(Tipo.Valor.numero, nuevoValor);
                             }
                             else

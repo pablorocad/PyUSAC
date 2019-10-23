@@ -33,6 +33,7 @@ namespace PyUSAC.Analisis
             var rtrue = ToTerm("true");
             var rfalse = ToTerm("false");
             var rlog = ToTerm("log");
+            var ralert = ToTerm("alert");
 
 
             //Simbolos-------------------------------------------------------------------
@@ -63,6 +64,7 @@ namespace PyUSAC.Analisis
 
                 DECLARACION = new NonTerminal("DECLARACION"),
                 LOG = new NonTerminal("LOG"),
+                ALERT = new NonTerminal("ALERT"),
 
                 L_ID = new NonTerminal("L_ID"),
                 ZI = new NonTerminal("ZI"),
@@ -85,6 +87,7 @@ namespace PyUSAC.Analisis
 
             INS.Rule = DECLARACION
                       | LOG
+                      | ALERT
                 ;
 
             DECLARACION.Rule = rvar + L_ID + ZI + puntocoma
@@ -101,6 +104,9 @@ namespace PyUSAC.Analisis
             LOG.Rule = rlog + parizq + E + parder + puntocoma
                 ;
 
+            ALERT.Rule = ralert + parizq + E + parder + puntocoma
+                ;
+
             E.Rule = E + mas + E
                     | E + menos + E
                     | E + multi + E
@@ -108,6 +114,7 @@ namespace PyUSAC.Analisis
                     | E + potencia + E
                     | parizq + E + parder
                     | menos + E
+                    //| E + mas + mas
                     | numero
                     | cadena
                     | identificador

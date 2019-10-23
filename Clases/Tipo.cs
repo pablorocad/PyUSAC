@@ -22,7 +22,7 @@ namespace PyUSAC.Clases
 
         public enum Instruccion
         {
-            declaracion, log
+            declaracion, log, alert
         };
 
     }

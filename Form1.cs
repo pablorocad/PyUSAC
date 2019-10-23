@@ -103,7 +103,7 @@ namespace PyUSAC
             TextBox temp = AreaEdicion.SelectedTab.Controls[0] as TextBox;
             Sintactico analisis = new Sintactico();
 
-            bool result = analisis.Analizar(temp.Text);
+            bool result = analisis.Analizar(temp.Text, 8200);
             AreaReportes.SelectTab("Consola");
 
             (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "";
@@ -125,6 +125,25 @@ namespace PyUSAC
             
 
            //AreaReportes.SelectTab("Consola");
+        }
+
+        private void BtnGenerar_Click(object sender, EventArgs e)
+        {
+            TextBox temp = AreaEdicion.SelectedTab.Controls[0] as TextBox;
+            Sintactico analisis = new Sintactico();
+
+            bool result = analisis.Analizar(temp.Text, 0);
+            AreaReportes.SelectTab("Consola");
+
+            if (result)
+            {
+                MessageBox.Show("Cadena correcta");
+
+            }
+            else
+            {
+                MessageBox.Show("Cadena incorrecta");
+            }
         }
     }
 }
