@@ -9,10 +9,14 @@ namespace PyUSAC.Clases
     class Tipo
     {
 
+
+        public enum Simbolo
+        {
+            variable, arreglo, clase, metodo, funcion
+        };
         public enum Valor
         {
-            numero, cadena, identificador, caracter, booleano, rnull,
-            clase, metodo, funcion
+            numero, cadena, identificador, caracter, booleano, rnull
         };
 
         public enum Error

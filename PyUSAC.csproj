@@ -55,6 +55,7 @@
     <Compile Include="Analisis\graficarArbol.cs" />
     <Compile Include="Analisis\Gramatica.cs" />
     <Compile Include="Analisis\Sintactico.cs" />
+    <Compile Include="Clases\Declaracion.cs" />
     <Compile Include="Clases\Entorno.cs" />
     <Compile Include="Clases\Error.cs" />
     <Compile Include="Clases\Expresion.cs" />

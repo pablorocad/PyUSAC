@@ -9,21 +9,21 @@ namespace PyUSAC.Clases
     class Simbolo
     {
 
-        Tipo.Valor tipo;
+        Tipo.Simbolo tipo;
         Object contenido;
 
-        public Simbolo(Tipo.Valor tipo, Object contenido)
+        public Simbolo(Tipo.Simbolo tipo, Object contenido)
         {
             this.tipo = tipo;
             this.contenido = contenido;
         }
 
-        public Tipo.Valor getTipo()
+        public Tipo.Simbolo getTipo()
         {
             return tipo;
         }
 
-        public void setTipo(Tipo.Valor tipo)
+        public void setTipo(Tipo.Simbolo tipo)
         {
             this.tipo = tipo;
         }
