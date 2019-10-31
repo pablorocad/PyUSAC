@@ -55,10 +55,13 @@
     <Compile Include="Analisis\graficarArbol.cs" />
     <Compile Include="Analisis\Gramatica.cs" />
     <Compile Include="Analisis\Sintactico.cs" />
+    <Compile Include="Clases\ArbolArreglo.cs" />
     <Compile Include="Clases\Declaracion.cs" />
+    <Compile Include="Clases\ElementoArreglo.cs" />
     <Compile Include="Clases\Entorno.cs" />
     <Compile Include="Clases\Error.cs" />
     <Compile Include="Clases\Expresion.cs" />
+    <Compile Include="Clases\NodoArreglo.cs" />
     <Compile Include="Clases\Simbolo.cs" />
     <Compile Include="Clases\Tipo.cs" />
     <Compile Include="Form1.cs">
@@ -68,6 +71,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Instrucciones\Alert.cs" />
+    <Compile Include="Instrucciones\Graph.cs" />
     <Compile Include="Instrucciones\Log.cs" />
     <Compile Include="Interfaces\Instruccion.cs" />
     <Compile Include="Program.cs" />

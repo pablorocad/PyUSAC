@@ -144,6 +144,14 @@ namespace PyUSAC
             {
                 MessageBox.Show("Cadena incorrecta");
             }
+
+            //    ArbolArreglo arbol = new ArbolArreglo("arr10");
+
+            //    arbol.add(2);
+            //    arbol.add(3);
+            //    arbol.add(4);
+
+            //    MessageBox.Show("");
         }
     }
 }

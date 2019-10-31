@@ -27,5 +27,10 @@ namespace PyUSAC.Clases
         {
             return valor;
         }
+
+        public void setValor(Object exp)
+        {
+            this.valor = exp;
+        }
     }
 }

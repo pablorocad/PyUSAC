@@ -8,14 +8,21 @@ namespace PyUSAC.Clases
 {
     class Declaracion
     {
-
+        Tipo.Simbolo tipo;
         String identificador;
-        Expresion exp;
+        Expresion exp = null;
+        ArbolArreglo arreglo = null;
 
         public Declaracion(string identificador, Expresion exp)
         {
             this.identificador = identificador;
             this.exp = exp;
+        }
+
+        public Declaracion(string identificador, ArbolArreglo arbol)
+        {
+            this.identificador = identificador;
+            this.arreglo = arbol; 
         }
 
         public String getIdentificador()
@@ -26,6 +33,12 @@ namespace PyUSAC.Clases
         public Expresion getExpresion()
         {
             return exp;
+        }
+
+
+        public ArbolArreglo getArbol()
+        {
+            return arreglo;
         }
 
         public void setExpresion(Expresion exp)

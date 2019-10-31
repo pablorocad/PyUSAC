@@ -68,9 +68,9 @@ namespace PyUSAC.Analisis
             try
             {
                 String DOT = graficarArbol.textoGraphviz(temp);
-                File.WriteAllText(Directory.GetCurrentDirectory() + "\\Carpetas\\AST.txt", DOT);
+                File.WriteAllText(Directory.GetCurrentDirectory() + "\\Carpetas\\Arbol\\AST.txt", DOT);
 
-                generarImagen(Directory.GetCurrentDirectory() + "\\Carpetas");
+                generarImagen(Directory.GetCurrentDirectory() + "\\Carpetas\\Arbol");
             }
             catch (Exception e)
             {
@@ -162,7 +162,17 @@ namespace PyUSAC.Analisis
                     
                     foreach (Declaracion dec in ID)
                     {
-                        Simbolo sim = new Simbolo(Tipo.Simbolo.variable, dec.getExpresion());
+
+                        Simbolo sim = null;
+
+                        if (dec.getExpresion() != null)
+                        {
+                            sim = new Simbolo(Tipo.Simbolo.variable, dec.getExpresion());
+                        }
+                        else if (dec.getArbol() != null)
+                        {
+                            sim = new Simbolo(Tipo.Simbolo.arreglo, dec.getArbol());
+                        }
                         ent.add(dec.getIdentificador(), sim, 0, 0);//Guardamos en el entorno
                     }
 
@@ -179,11 +189,23 @@ namespace PyUSAC.Analisis
                 case "ASIGNACION":
 
                     String name = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
-                    Expresion expAs = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                    Expresion expAs = resolverExpresion(temp.ChildNodes.ElementAt(3), ent);
 
+                    if (temp.ChildNodes.ElementAt(1).ChildNodes.Count != 0)
+                    {
+                        LinkedList<Expresion> l_dim = L_DIM(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);
+                        Simbolo aux = ent.search(name, 0, 0);
 
-                    
-                    if (expAs != null)
+                        if (aux != null)
+                        {
+                            ArbolArreglo arbolAux = ((ArbolArreglo)aux.getContenido());
+                            arbolAux.setValor(expAs, l_dim);
+                            Simbolo simAs = new Simbolo(Tipo.Simbolo.arreglo, arbolAux);
+
+                            ent.edit(name, simAs);
+                        }
+                    }
+                    else
                     {
                         Simbolo simAs = new Simbolo(Tipo.Simbolo.variable, expAs);
 
@@ -191,6 +213,32 @@ namespace PyUSAC.Analisis
                     }
 
                     return null;
+
+                case "GRAPH":
+                    Expresion nameGraph = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                    Expresion grafo = resolverExpresion(temp.ChildNodes.ElementAt(4), ent);
+
+                    if (nameGraph.getTipo().Equals(Tipo.Valor.cadena))
+                    {
+                        if (grafo.getTipo().Equals(Tipo.Valor.cadena))
+                        {
+                            return new Graph(nameGraph.getValor().ToString(), grafo.getValor().ToString());
+                        }
+                        listaErrores.Add(new Error(Tipo.Error.semantico, "Graph(Cadena,Cadena), Se esperaba una cadena" +
+                        " en el segundo parametro", 0, 0));
+
+                        MessageBox.Show("Graph(Cadena,Cadena), Se esperaba una cadena" +
+                            " en el segundo parametro");
+                    }
+
+                    listaErrores.Add(new Error(Tipo.Error.semantico, "Graph(Cadena,Cadena), Se esperaba una cadena" +
+                        " en el primer parametro", 0, 0));
+
+                    MessageBox.Show("Graph(Cadena,Cadena), Se esperaba una cadena" +
+                        " en el primer parametro");
+
+                    return null;
+                    break;
             }
             return null;
         }
@@ -203,20 +251,48 @@ namespace PyUSAC.Analisis
             {
                 l_id = L_ID(temp.ChildNodes.ElementAt(0), ent);//Tomamos la lista
                 String id = temp.ChildNodes.ElementAt(2).ToString().Split(' ')[0];//Tomamos el ID
-                Declaracion dec;
+                Declaracion dec = null;
 
                 if (temp.ChildNodes.ElementAt(3).ChildNodes.Count != 0)//Si trae una asignacion
                 {
-                    Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(3).ChildNodes.ElementAt(1), ent);//Resolvemos la expresion
-
-                    dec = new Declaracion(id, exp);//Guardamos la nueva declaracion
-
-                    for(int x = l_id.Count - 1; x >= 0; x--)//Recorremos la lista para atras para cambiar lso nulos
+                    if (!temp.ChildNodes.ElementAt(3).ChildNodes.ElementAt(0).Term.ToString().Equals("L_DIM"))//Si es variable normal
                     {
-                        if (l_id.ElementAt(x).getExpresion().getTipo().Equals(Tipo.Valor.rnull))
+                        Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(3).ChildNodes.ElementAt(1), ent);
+
+                        dec = new Declaracion(id, exp);
+
+                        for (int x = l_id.Count - 1; x >= 0; x--)//Recorremos la lista para atras para cambiar lso nulos
                         {
-                            l_id.ElementAt(x).setExpresion(exp);
+                            if (l_id.ElementAt(x).getExpresion().getTipo().Equals(Tipo.Valor.rnull))
+                            {
+                                l_id.ElementAt(x).setExpresion(exp);
+                            }
                         }
+                    }
+                    else
+                    {//Si es un arreglo
+                        LinkedList<Expresion> l_dim = L_DIM(temp.ChildNodes.ElementAt(3).ChildNodes.ElementAt(0), ent);
+                        ArbolArreglo arreglo = new ArbolArreglo(id);
+
+                        if (temp.ChildNodes.ElementAt(3).ChildNodes.ElementAt(1).ChildNodes.Count != 0)//si tra valores
+                        {
+                            LinkedList<NodoArreglo> valores = new LinkedList<NodoArreglo>();
+                            valores = VAL_ARR(temp.ChildNodes.ElementAt(3).ChildNodes.ElementAt(1).ChildNodes.ElementAt(1), ent);
+                            //Mandamos a traer los valores
+
+                            
+                            arreglo.setValores(valores.ElementAt(0).getListaHijos());
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            foreach (Expresion ex in l_dim)
+                            {
+                                arreglo.crearNodo(int.Parse(ex.getValor().ToString()));
+                            }
+                        }
+
+                        dec = new Declaracion(id, arreglo);
                     }
                 }
                 else
@@ -230,13 +306,40 @@ namespace PyUSAC.Analisis
             {
                 l_id = new LinkedList<Declaracion>();//El primer ID, crreamos la lista
                 String id = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
-                Declaracion dec;
+                Declaracion dec = null;
 
                 if (temp.ChildNodes.ElementAt(1).ChildNodes.Count != 0)
                 {
-                    Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(1), ent);
+                    if (!temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0).Term.ToString().Equals("L_DIM"))//Si es variable normal
+                    {
+                        Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(1), ent);
 
-                    dec = new Declaracion(id, exp);
+                        dec = new Declaracion(id, exp);
+                    }
+                    else{//Si es un arreglo
+                        LinkedList<Expresion> l_dim = L_DIM(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);
+                        ArbolArreglo arreglo = new ArbolArreglo(id);
+                        if (temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(1).ChildNodes.Count != 0)
+                        {
+
+                            LinkedList<NodoArreglo> valores = new LinkedList<NodoArreglo>();
+                            valores = VAL_ARR(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(1).ChildNodes.ElementAt(1), ent);
+                            //Mandamos a traer los valores
+
+                            
+                            arreglo.setValores(valores.ElementAt(0).getListaHijos());
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            foreach (Expresion ex in l_dim)
+                            {
+                                arreglo.crearNodo(int.Parse(ex.getValor().ToString()));
+                            }
+                        }
+
+                        dec = new Declaracion(id, arreglo);
+                    }
                 }
                 else
                 {
@@ -246,6 +349,78 @@ namespace PyUSAC.Analisis
                 l_id.AddLast(dec);//Guardamos
             }
             return l_id;
+        }
+
+        public LinkedList<NodoArreglo> VAL_ARR(ParseTreeNode temp, Entorno ent)
+        {
+            LinkedList<NodoArreglo> lista = new LinkedList<NodoArreglo>();
+
+            if (temp.ChildNodes.Count == 3)//Si vienen { }
+            {               
+                NodoArreglo nuevo = new NodoArreglo(null);
+                LinkedList<NodoArreglo> listaH = null;
+                listaH = VAL_ARR(temp.ChildNodes.ElementAt(1), ent);
+
+                nuevo.setListaHijos(listaH);
+                lista.AddLast(nuevo);
+            }
+            else if (temp.ChildNodes.Count == 5)//viene {},{}
+            {
+
+                lista = VAL_ARR(temp.ChildNodes.ElementAt(0), ent);//Guardar todo como nodos del arreglo xd
+                LinkedList<NodoArreglo> listaH = VAL_ARR(temp.ChildNodes.ElementAt(3), ent);
+
+                NodoArreglo nuevo = new NodoArreglo(null);
+                nuevo.setListaHijos(listaH);
+
+                lista.AddLast(nuevo);
+
+            }
+            else if (temp.ChildNodes.Count == 1)//vviene { L_EXP }
+            {
+                lista = L_EXP(temp.ChildNodes.ElementAt(0), ent);
+            }
+
+            return lista;
+        }
+
+        public LinkedList<NodoArreglo> L_EXP(ParseTreeNode temp, Entorno ent)
+        {
+            LinkedList<NodoArreglo> l_exp = null;
+            Expresion exp = null;
+
+            if (temp.ChildNodes.Count == 3)
+            {
+                l_exp = L_EXP(temp.ChildNodes.ElementAt(0), ent);
+                exp = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                l_exp.AddLast(new NodoArreglo(exp));
+            }
+            else if (temp.ChildNodes.Count == 1)
+            {
+                l_exp = new LinkedList<NodoArreglo>();
+                exp = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                l_exp.AddLast(new NodoArreglo(exp));
+            }
+
+            return l_exp;
+        }
+
+        public LinkedList<Expresion> L_DIM(ParseTreeNode temp, Entorno ent)
+        {
+            LinkedList<Expresion> lista = null;
+            if (temp.ChildNodes.Count == 4)
+            {
+                lista = L_DIM(temp.ChildNodes.ElementAt(0), ent);
+                Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                lista.AddLast(exp);
+            }
+            else if (temp.ChildNodes.Count == 3)
+            {
+                lista = new LinkedList<Expresion>();
+                Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(1), ent);
+                lista.AddLast(exp);
+            }
+            return lista;
         }
 
         public Expresion resolverExpresion(ParseTreeNode temp, Entorno ent)
@@ -861,41 +1036,52 @@ namespace PyUSAC.Analisis
             }
             else if (temp.ChildNodes.Count == 2)
             {
-                Expresion hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(1), ent);
-                String n = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
-
-                if (n.Equals("-"))
+                if (!temp.ChildNodes.ElementAt(1).ToString().Equals("ZI2"))
                 {
-                    if (hijo2.getTipo().Equals(Tipo.Valor.numero))
-                    {
-                        return new Expresion(Tipo.Valor.numero, -1 * Double.Parse(hijo2.getValor().ToString()));
-                    }
-                    else if (hijo2.getTipo().Equals(Tipo.Valor.cadena))
-                    {
-                        return new Expresion(Tipo.Valor.cadena, "-" + hijo2.getValor().ToString());
-                    }
-                    else if (hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                    {
-                        double car = Convert.ToChar(hijo2.getValor().ToString());
+                    Expresion hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(1), ent);
+                    String n = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
 
-                        return new Expresion(Tipo.Valor.cadena, -1 * car);
+                    if (n.Equals("-"))
+                    {
+                        if (hijo2.getTipo().Equals(Tipo.Valor.numero))
+                        {
+                            return new Expresion(Tipo.Valor.numero, -1 * Double.Parse(hijo2.getValor().ToString()));
+                        }
+                        else if (hijo2.getTipo().Equals(Tipo.Valor.cadena))
+                        {
+                            return new Expresion(Tipo.Valor.cadena, "-" + hijo2.getValor().ToString());
+                        }
+                        else if (hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                        {
+                            double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                            return new Expresion(Tipo.Valor.cadena, -1 * car);
+                        }
+                    }
+                    else if (n.Equals("!"))
+                    {
+                        if (hijo2.getTipo().Equals(Tipo.Valor.booleano))
+                        {
+                            return new Expresion(Tipo.Valor.booleano, !((Boolean)hijo2.getValor()));
+                        }
+                        else
+                        {
+                            listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo2.getValor().ToString()
+                                        + ". No puede negarse", 0, 0));
+
+                            MessageBox.Show("La expresion: " + hijo2.getValor().ToString()
+                                        + ". No puede negarse");
+                            return null;
+                        }
                     }
                 }
-                else if (n.Equals("!"))
+                else
                 {
-                    if (hijo2.getTipo().Equals(Tipo.Valor.booleano))
-                    {
-                        return new Expresion(Tipo.Valor.booleano, !((Boolean)hijo2.getValor()));
-                    }
-                    else
-                    {
-                        listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo2.getValor().ToString()
-                                    + ". No puede negarse", 0, 0));
+                    Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], 0, 0);
+                    LinkedList<Expresion> l_dim = L_DIM(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);
+                    ArbolArreglo arbolAux = ((ArbolArreglo)sim.getContenido());
 
-                        MessageBox.Show("La expresion: " + hijo2.getValor().ToString()
-                                    + ". No puede negarse");
-                        return null;
-                    }
+                    return arbolAux.getValor(l_dim);
                 }
             }
             else if (temp.ChildNodes.Count == 1)
@@ -905,7 +1091,7 @@ namespace PyUSAC.Analisis
                 switch (type)
                 {
                     case "numero":
-                        return new Expresion(Tipo.Valor.numero, temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0]);
+                        return new Expresion(Tipo.Valor.numero, int.Parse(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0]));
 
                     case "caracter":
                         return new Expresion(Tipo.Valor.caracter, temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0]);

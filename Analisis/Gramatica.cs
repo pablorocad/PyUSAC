@@ -47,6 +47,10 @@ namespace PyUSAC.Analisis
             var potencia = ToTerm("pow");
             var parizq = ToTerm("(");
             var parder = ToTerm(")");
+            var llaveizq = ToTerm("{");
+            var llaveder = ToTerm("}");
+            var corcheteizq = ToTerm("[");
+            var corcheteder = ToTerm("]");
             var mayor = ToTerm(">");
             var menor = ToTerm("<");
             var igualigual = ToTerm("==");
@@ -79,6 +83,11 @@ namespace PyUSAC.Analisis
 
 
                 DECLARACION = new NonTerminal("DECLARACION"),
+                L_DIM = new NonTerminal("L_DIM"),
+                VAL_ARR = new NonTerminal("VAL_ARR"),
+                VAL_ARR2 = new NonTerminal("VAL_ARR2"),
+                L_EXP = new NonTerminal("L_EXP"),
+
                 LOG = new NonTerminal("LOG"),
                 ALERT = new NonTerminal("ALERT"),
                 ASIGNACION = new NonTerminal("ASIGNACION"),
@@ -86,6 +95,7 @@ namespace PyUSAC.Analisis
 
                 L_ID = new NonTerminal("L_ID"),
                 ZI = new NonTerminal("ZI"),
+                ZI2 = new NonTerminal("ZI2"),
                 E = new NonTerminal("E");
                 ;
 
@@ -107,7 +117,7 @@ namespace PyUSAC.Analisis
                       | LOG
                       | ALERT
                       | ASIGNACION
-                      |GRAPH
+                      | GRAPH
                 ;
 
             DECLARACION.Rule = rvar + L_ID + puntocoma
@@ -118,8 +128,30 @@ namespace PyUSAC.Analisis
                        ;
 
             ZI.Rule = igual + E
+                    |L_DIM + VAL_ARR
                     | Empty
                     ;
+
+            ZI2.Rule = L_DIM
+                     | Empty
+                     ;
+
+            L_DIM.Rule = L_DIM + corcheteizq + E + corcheteder
+                        | corcheteizq + E + corcheteder
+                ;
+
+            VAL_ARR.Rule = igual + VAL_ARR2
+                         |Empty
+                ;
+
+            VAL_ARR2.Rule = VAL_ARR2 + coma + llaveizq + VAL_ARR2 + llaveder
+                          | llaveizq + VAL_ARR2 + llaveder
+                          | L_EXP
+                ;
+
+            L_EXP.Rule = L_EXP + coma + E
+                       | E
+                       ;
 
             LOG.Rule = rlog + parizq + E + parder + puntocoma
                 ;
@@ -127,7 +159,7 @@ namespace PyUSAC.Analisis
             ALERT.Rule = ralert + parizq + E + parder + puntocoma
                 ;
 
-            ASIGNACION.Rule = identificador + igual + E + puntocoma
+            ASIGNACION.Rule = identificador + ZI2 + igual + E + puntocoma
                 ;
 
             GRAPH.Rule = rgraph + parizq + E + coma + E + parder + puntocoma
@@ -153,7 +185,7 @@ namespace PyUSAC.Analisis
                     | menos + E
                     | numero
                     | cadena
-                    | identificador
+                    | identificador + ZI2
                     | caracter
                     | rtrue
                     | rfalse
