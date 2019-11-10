@@ -38,14 +38,21 @@ namespace PyUSAC.Clases
 
         public void edit(String name, Simbolo sm)
         {
-            if (tabla.ContainsKey(name.ToLower()))
+            Boolean aux = true;
+            for (Entorno en = this; en != null; en = en.anterior)
             {
-                tabla[name.ToLower()] = sm;
+                if (en.tabla.ContainsKey(name.ToLower()))
+                {
+                    en.tabla[name.ToLower()] = sm;
+                    aux = false;
+                    return;
+                }
             }
-            else
+
+            if (aux)
             {
                 Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
-                "La variable " + name + " no existe", 0,0));
+                "La variable " + name + " no existe", 0, 0));
                 MessageBox.Show("La variable " + name + " no esxiste");
             }
         }

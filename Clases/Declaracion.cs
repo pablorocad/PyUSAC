@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Irony.Parsing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,19 +11,23 @@ namespace PyUSAC.Clases
     {
         Tipo.Simbolo tipo;
         String identificador;
-        Expresion exp = null;
-        ArbolArreglo arreglo = null;
+        ParseTreeNode exp = null;
+        ParseTreeNode dimensiones = null;
+        Boolean h;
 
-        public Declaracion(string identificador, Expresion exp)
+        public Declaracion(string identificador, ParseTreeNode exp)
         {
             this.identificador = identificador;
             this.exp = exp;
+            this.tipo = Tipo.Simbolo.variable;
         }
 
-        public Declaracion(string identificador, ArbolArreglo arbol)
+        public Declaracion(string identificador, ParseTreeNode dimensiones, ParseTreeNode valores)
         {
             this.identificador = identificador;
-            this.arreglo = arbol; 
+            this.dimensiones = dimensiones;
+            exp = valores;
+            this.tipo = Tipo.Simbolo.arreglo;
         }
 
         public String getIdentificador()
@@ -30,20 +35,25 @@ namespace PyUSAC.Clases
             return identificador;
         }
 
-        public Expresion getExpresion()
+        public ParseTreeNode getExpresion()
         {
             return exp;
         }
 
 
-        public ArbolArreglo getArbol()
+        public ParseTreeNode getArbol()
         {
-            return arreglo;
+            return dimensiones;
         }
 
-        public void setExpresion(Expresion exp)
+        public void setExpresion(ParseTreeNode exp)
         {
             this.exp = exp;
+        }
+
+        public Tipo.Simbolo getTipo()
+        {
+            return tipo;
         }
     }
 }

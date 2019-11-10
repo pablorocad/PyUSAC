@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="Analisis\graficarArbol.cs" />
     <Compile Include="Analisis\Gramatica.cs" />
+    <Compile Include="Analisis\Resolve.cs" />
+    <Compile Include="Analisis\SegundaPasada.cs" />
     <Compile Include="Analisis\Sintactico.cs" />
     <Compile Include="Clases\ArbolArreglo.cs" />
     <Compile Include="Clases\Declaracion.cs" />
@@ -71,8 +73,15 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Instrucciones\Alert.cs" />
+    <Compile Include="Instrucciones\Asignacion.cs" />
+    <Compile Include="Instrucciones\Aum_Dec.cs" />
+    <Compile Include="Instrucciones\Bloque.cs" />
+    <Compile Include="Instrucciones\Dec.cs" />
+    <Compile Include="Instrucciones\Do_While.cs" />
     <Compile Include="Instrucciones\Graph.cs" />
+    <Compile Include="Instrucciones\IF.cs" />
     <Compile Include="Instrucciones\Log.cs" />
+    <Compile Include="Instrucciones\While.cs" />
     <Compile Include="Interfaces\Instruccion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

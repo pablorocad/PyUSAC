@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PyUSAC.Analisis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -67,21 +68,22 @@ namespace PyUSAC.Clases
             }
         }
 
-        public Expresion getValor(LinkedList<Expresion> posicion)
+        public Expresion getValor(LinkedList<Expresion> posicion, int fila, int columna)
         {
-            return getValor(posicion, raiz, 0);
+            return getValor(posicion, raiz, 0, fila, columna);
         }
 
-        public Expresion getValor(LinkedList<Expresion> posicion, NodoArreglo temp, int v)
+        public Expresion getValor(LinkedList<Expresion> posicion, NodoArreglo temp, int v, int fila, int columna)
         {
-            if (!(temp.Count() == 0))
+            if (temp.Count() != 0)
             {
                 int num = int.Parse(posicion.ElementAt(v).getValor().ToString());
                 if (num < temp.Count())
                 {
-                    return getValor(posicion, temp.getHijo(num), v + 1);
+                    return getValor(posicion, temp.getHijo(num), v + 1, fila, columna);
                 }
-                
+                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "Indice fuera de los limites", fila, columna));
+                return new Expresion(Tipo.Valor.rnull, null);
             }
             return temp.getValor();
         }

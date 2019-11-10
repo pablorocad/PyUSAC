@@ -35,6 +35,15 @@ namespace PyUSAC.Analisis
             var rlog = ToTerm("log");
             var ralert = ToTerm("alert");
             var rgraph = ToTerm("graph");
+            var rif = ToTerm("if");
+            var relse = ToTerm("else");
+            var rwhile = ToTerm("while");
+            var rdo = ToTerm("do");
+            var rfor = ToTerm("for");
+            var rswitch = ToTerm("switch");
+            var rcase = ToTerm("case");
+            var rbreak = ToTerm("break");
+            var rdefault = ToTerm("default");
 
             //Simbolos-------------------------------------------------------------------
             var igual = ToTerm("=");
@@ -61,6 +70,9 @@ namespace PyUSAC.Analisis
             var or = ToTerm("||");
             var xor = ToTerm("^");
             var not = ToTerm("!");
+            var aumento = ToTerm("++");
+            var decremento = ToTerm("--");
+            var dospuntos = ToTerm(":");
             #endregion
 
             #region Precedencia
@@ -71,7 +83,9 @@ namespace PyUSAC.Analisis
             RegisterOperators(5, mayor, menor, mayorigual, menorigual);
             RegisterOperators(6, mas, menos);
             RegisterOperators(7, multi, div);
-            RegisterOperators(8, not);
+            RegisterOperators(8, potencia);
+            RegisterOperators(9, not);
+            RegisterOperators(10, aumento, decremento);
             #endregion
 
             #region No Terminales
@@ -80,6 +94,7 @@ namespace PyUSAC.Analisis
                 S = new NonTerminal("S"),
                 L_INS = new NonTerminal("L_INS"),
                 INS = new NonTerminal("INS"),
+                SUBINS = new NonTerminal("SUBINS"),
 
 
                 DECLARACION = new NonTerminal("DECLARACION"),
@@ -92,11 +107,24 @@ namespace PyUSAC.Analisis
                 ALERT = new NonTerminal("ALERT"),
                 ASIGNACION = new NonTerminal("ASIGNACION"),
                 GRAPH = new NonTerminal("GRAPH"),
+                AUM_DEC = new NonTerminal("AUM_DEC"),
 
+                IF = new NonTerminal("IF"),
+                ELSE = new NonTerminal("ELSE"),
+                WHILE = new NonTerminal("WHILE"),
+                DO_WHILE = new NonTerminal("DO_WHILE"),
+                FOR = new NonTerminal("FOR"),
+                DEC_ASIG = new NonTerminal("DEC_ASIG"),
+                SWITCH = new NonTerminal("SWITCH"),
+                BLOQUE_SW = new NonTerminal("BLOQUE_SW"),
+                DEFAULT = new NonTerminal("DEFAULT"),
+                BREAK = new NonTerminal("BREAK"),
+
+                BLOQUE = new NonTerminal("BLOQUE"),
                 L_ID = new NonTerminal("L_ID"),
                 ZI = new NonTerminal("ZI"),
                 ZI2 = new NonTerminal("ZI2"),
-                E = new NonTerminal("E");
+                E = new NonTerminal("E")
                 ;
 
             #endregion
@@ -118,6 +146,16 @@ namespace PyUSAC.Analisis
                       | ALERT
                       | ASIGNACION
                       | GRAPH
+                      | AUM_DEC
+                      | IF
+                      | WHILE
+                      | DO_WHILE
+                      | FOR
+                      | SWITCH
+                ;
+
+            SUBINS.Rule = L_INS
+                        |Empty
                 ;
 
             DECLARACION.Rule = rvar + L_ID + puntocoma
@@ -165,6 +203,49 @@ namespace PyUSAC.Analisis
             GRAPH.Rule = rgraph + parizq + E + coma + E + parder + puntocoma
                 ;
 
+            AUM_DEC.Rule = E + aumento + puntocoma
+                      | E + decremento + puntocoma
+                      ;
+
+
+            IF.Rule = rif + parizq + E + parder + BLOQUE + ELSE
+                ;
+
+            BLOQUE.Rule = llaveizq + SUBINS + llaveder
+                ;
+
+            ELSE.Rule = relse + IF
+                      | relse + BLOQUE
+                      |Empty
+                    ;
+
+            WHILE.Rule = rwhile +parizq + E + parder + BLOQUE
+                ;
+
+            DO_WHILE.Rule = rdo + BLOQUE + rwhile + parizq + E + parder + puntocoma
+                ;
+
+            FOR.Rule = rfor + parizq + DEC_ASIG + puntocoma + E + puntocoma + E + parder + BLOQUE
+                ;
+
+            DEC_ASIG.Rule = rvar + identificador + igual + E
+                          | identificador + igual + E
+                          ;
+
+            SWITCH.Rule = rswitch + parizq + identificador + parder + llaveizq + BLOQUE_SW + DEFAULT + llaveder
+                ;
+
+            BLOQUE_SW.Rule = BLOQUE_SW + rcase + E + dospuntos + SUBINS + BREAK
+                            | rcase + E + dospuntos + SUBINS + BREAK
+                            ;
+
+            BREAK.Rule = rbreak + puntocoma
+                        | Empty
+                        ;
+
+            DEFAULT.Rule = rdefault + dospuntos + SUBINS + BREAK
+                          | Empty
+                          ;
 
             E.Rule = E + mas + E
                     | E + menos + E
@@ -180,6 +261,8 @@ namespace PyUSAC.Analisis
                     | E + or + E
                     | E + and + E
                     | E + xor + E
+                    |E + aumento
+                    |E + decremento
                     | not + E
                     | parizq + E + parder
                     | menos + E

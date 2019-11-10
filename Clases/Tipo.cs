@@ -26,7 +26,8 @@ namespace PyUSAC.Clases
 
         public enum Instruccion
         {
-            declaracion, log, alert, graph
+            declaracion, log, alert, graph, If, While, For, Do_While, Switch, Bloque, asignacion,
+
         };
 
     }

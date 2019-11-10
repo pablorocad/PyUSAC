@@ -122,9 +122,22 @@ namespace PyUSAC
                 (AreaReportes.SelectedTab.Controls[0] as TextBox).Text = "Cadena incorrecta";
             }
 
-            
+            if (Sintactico.listaErrores.Count != 0)
+            {
+                AreaReportes.SelectTab(1);
+                (AreaReportes.SelectedTab.Controls[0] as DataGridView).Rows.Clear();
 
-           //AreaReportes.SelectTab("Consola");
+                foreach (Error err in Sintactico.listaErrores)
+                {
+                    (AreaReportes.SelectedTab.Controls[0] as DataGridView).Rows.Add(
+                        err.getTipo().ToString(), 
+                        err.getDescripcion().ToString(),
+                        err.getFila().ToString(),
+                        err.getColumna().ToString());
+                }
+            }
+
+            //AreaReportes.SelectTab("Consola");
         }
 
         private void BtnGenerar_Click(object sender, EventArgs e)

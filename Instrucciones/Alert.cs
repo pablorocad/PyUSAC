@@ -1,4 +1,6 @@
-﻿using PyUSAC.Clases;
+﻿using Irony.Parsing;
+using PyUSAC.Analisis;
+using PyUSAC.Clases;
 using PyUSAC.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,9 +14,9 @@ namespace PyUSAC.Instrucciones
     class Alert : Instruccion
     {
 
-        Expresion exp;
+        ParseTreeNode exp;
 
-        public Alert(Expresion exp)
+        public Alert(ParseTreeNode exp)
         {
             this.exp = exp;
         }
@@ -23,7 +25,9 @@ namespace PyUSAC.Instrucciones
         {
             if (exp != null)
             {
-                MessageBox.Show(exp.getValor().ToString());
+                Resolve resolve = new Resolve();
+                Expresion aux = resolve.resolverExpresion(exp, ent);
+                MessageBox.Show(aux.getValor().ToString());
             }
         }
 

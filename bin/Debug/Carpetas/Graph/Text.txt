@@ -1,1 +1,1 @@
-digraph g{ rankdir=LR; webgraphviz -> a -> gmail -> b -> com }
+digraph G{ node1 -> node2}

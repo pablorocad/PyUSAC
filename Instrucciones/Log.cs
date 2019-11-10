@@ -1,4 +1,5 @@
-﻿using PyUSAC.Analisis;
+﻿using Irony.Parsing;
+using PyUSAC.Analisis;
 using PyUSAC.Clases;
 using PyUSAC.Interfaces;
 using System;
@@ -13,9 +14,9 @@ namespace PyUSAC.Instrucciones
     class Log : Instruccion
     {
 
-        Expresion exp;
+        ParseTreeNode exp;
 
-        public Log(Expresion exp)
+        public Log(ParseTreeNode exp)
         {
             this.exp = exp;
         }
@@ -24,7 +25,12 @@ namespace PyUSAC.Instrucciones
         {
             if (exp != null)
             {
-                Sintactico.listaImp.AddLast(exp.getValor().ToString());
+                Resolve resolve = new Resolve();
+                Expresion aux = resolve.resolverExpresion(exp, ent);//Resolvemos la expresion
+                if (aux.getValor() != null)
+                {
+                    Sintactico.listaImp.AddLast(aux.getValor().ToString());
+                }
             }
         }
 
