@@ -132,7 +132,8 @@ namespace PyUSAC.Analisis
                 SWITCH = new NonTerminal("SWITCH"),
                 BLOQUE_SW = new NonTerminal("BLOQUE_SW"),
                 DEFAULT = new NonTerminal("DEFAULT"),
-                BREAK_CONTINUE = new NonTerminal("BREAK_CONTINUE"),
+                BREAK = new NonTerminal("BREAK"),
+                CONTINUE = new NonTerminal("CONTINUE"),
                 CLASE = new NonTerminal("CLASE"),
                 METODO = new NonTerminal("METODO"),
                 FUNCION = new NonTerminal("FUNCION"),
@@ -193,7 +194,8 @@ namespace PyUSAC.Analisis
                       | DO_WHILE
                       | FOR
                       | SWITCH
-                      | BREAK_CONTINUE
+                      | BREAK
+                      | CONTINUE
                       | FUNCION
                       | METODO
                       | RETURN
@@ -276,16 +278,17 @@ namespace PyUSAC.Analisis
             SWITCH.Rule = rswitch + parizq + E + parder + llaveizq + BLOQUE_SW + DEFAULT + llaveder
                 ;
 
-            BLOQUE_SW.Rule = BLOQUE_SW + rcase + E + dospuntos + L_INSB + BREAK_CONTINUE
-                            | rcase + E + dospuntos + L_INSB + BREAK_CONTINUE
+            BLOQUE_SW.Rule = BLOQUE_SW + rcase + E + dospuntos + L_INSB
+                            | rcase + E + dospuntos + L_INSB
                             ;
 
-            BREAK_CONTINUE.Rule = rbreak + puntocoma
-                        | rcontinue + puntocoma
-                        | Empty
+            BREAK.Rule = rbreak + puntocoma
                         ;
 
-            DEFAULT.Rule = rdefault + dospuntos + L_INSB + BREAK_CONTINUE
+            CONTINUE.Rule = rcontinue + puntocoma
+                        ;
+
+            DEFAULT.Rule = rdefault + dospuntos + L_INSB
                           | Empty
                           ;
 

@@ -23,6 +23,9 @@ namespace PyUSAC.Instrucciones
 
         public void Ejecutar(Entorno ent)
         {
+
+            Sintactico.pilaBreak.Push(this);
+
             Resolve resolve = new Resolve();
             Expresion cond = resolve.resolverExpresion(condicion, ent);
 
@@ -32,6 +35,12 @@ namespace PyUSAC.Instrucciones
                 {
                     do
                     {
+
+                        if (Sintactico.pilaBreak.Count == 0 || !Sintactico.pilaBreak.Peek().Equals(this))
+                        {
+                            break;
+                        }
+
                         bloque.Ejecutar(ent);
                         cond = resolve.resolverExpresion(condicion, ent);
                         if (cond.getTipo().Equals(Tipo.Valor.rnull))
@@ -47,6 +56,10 @@ namespace PyUSAC.Instrucciones
                     int columna = condicion.Span.Location.Column;
                     Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La Expresion debe ser booleana", linea, columna));
                 }
+            }
+            if (Sintactico.pilaBreak.Count != 0 && Sintactico.pilaBreak.Peek().Equals(this))
+            {
+                Sintactico.pilaBreak.Pop();
             }
         }
 

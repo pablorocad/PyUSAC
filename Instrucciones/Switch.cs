@@ -25,6 +25,8 @@ namespace PyUSAC.Instrucciones
 
         public void Ejecutar(Entorno ent)
         {
+            Sintactico.pilaBreak.Push(this);
+
             Resolve resolve = new Resolve();
             Boolean z = true;
             Expresion cond = resolve.resolverExpresion(entrada, ent);//Resolvemos la condicion
@@ -33,16 +35,19 @@ namespace PyUSAC.Instrucciones
             {
                 foreach (Case cs in listaCasos)
                 {
+
+                    if (Sintactico.pilaBreak.Count == 0 || !Sintactico.pilaBreak.Peek().Equals(this))
+                    {
+                        break;
+                    }
+
                     Expresion expCs = resolve.resolverExpresion(cs.getCondicion(), ent);//Resolvemos la condicion
 
                     if (cond.getValor().ToString().ToLower().Equals(expCs.getValor().ToString().ToLower()))
                     {
                         z = false;
                         cs.getBloque().Ejecutar(ent);
-                        if (cs.getBreak())
-                        {
-                            break;
-                        }
+
                         cond = resolve.resolverExpresion(entrada, ent);
                         if (cond.getTipo().Equals(Tipo.Valor.rnull))
                         {
@@ -55,6 +60,10 @@ namespace PyUSAC.Instrucciones
                 {
                     rdefault.Ejecutar(ent);
                 }
+            }
+            if (Sintactico.pilaBreak.Count != 0 && Sintactico.pilaBreak.Peek().Equals(this))
+            {
+                Sintactico.pilaBreak.Pop();
             }
         }
 

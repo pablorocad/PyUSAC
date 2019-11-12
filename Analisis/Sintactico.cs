@@ -20,7 +20,9 @@ namespace PyUSAC.Analisis
         LinkedList<Instruccion> listaIns;
         public static LinkedList<String> listaImp;
         Resolve resolve = new Resolve();
+
         public static Stack<Instruccion> pilaBreak = new Stack<Instruccion>();
+        public static Stack<Instruccion> pilaContinue = new Stack<Instruccion>();
 
         public Sintactico()
         {

@@ -81,6 +81,8 @@
     <Compile Include="Instrucciones\Asignacion.cs" />
     <Compile Include="Instrucciones\Aum_Dec.cs" />
     <Compile Include="Instrucciones\Bloque.cs" />
+    <Compile Include="Instrucciones\Break.cs" />
+    <Compile Include="Instrucciones\Continue.cs" />
     <Compile Include="Instrucciones\Dec.cs" />
     <Compile Include="Instrucciones\Do_While.cs" />
     <Compile Include="Instrucciones\For.cs" />

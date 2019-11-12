@@ -197,6 +197,13 @@ namespace PyUSAC.Analisis
                     return new Switch(entrada, listaCase, def);
                     break;
 
+                case "BREAK":
+                    return new Break();
+
+                case "CONTINUE":
+                    return new Continue();
+
+
             }
             return null;
         }
@@ -297,7 +304,7 @@ namespace PyUSAC.Analisis
         {
             LinkedList<Case> listaCase = null;
 
-            if (temp.ChildNodes.Count == 6)
+            if (temp.ChildNodes.Count == 5)
             {
                 listaCase = BLOQUE_SW(temp.ChildNodes.ElementAt(0), ent);
                 ParseTreeNode condicion = temp.ChildNodes.ElementAt(2);
@@ -307,14 +314,10 @@ namespace PyUSAC.Analisis
                 Bloque bloque = new Bloque(lista);
 
                 Case @case = new Case(condicion, bloque);
-                if (temp.ChildNodes.ElementAt(5).ChildNodes.Count != 0)
-                {
-                    @case.setBreak(true);
-                }
 
                 listaCase.AddLast(@case);
             }
-            else if (temp.ChildNodes.Count == 5)
+            else if (temp.ChildNodes.Count == 4)
             {
                 listaCase = new LinkedList<Case>();
                 ParseTreeNode condicion = temp.ChildNodes.ElementAt(1);
@@ -324,10 +327,6 @@ namespace PyUSAC.Analisis
                 Bloque bloque = new Bloque(lista);
 
                 Case @case = new Case(condicion, bloque);
-                if (temp.ChildNodes.ElementAt(4).ChildNodes.Count != 0)
-                {
-                    @case.setBreak(true);
-                }
 
                 listaCase.AddLast(@case);
 

@@ -22,6 +22,9 @@ namespace PyUSAC.Instrucciones
 
         public void Ejecutar(Entorno ent)
         {
+            int num = Sintactico.pilaBreak.Count;
+            int numC = Sintactico.pilaContinue.Count;
+
             Entorno nuevo = new Entorno(ent);
             SegundaPasada leer = new SegundaPasada();
             LinkedList<Instruccion> lista;
@@ -30,7 +33,27 @@ namespace PyUSAC.Instrucciones
 
             foreach(Instruccion ins in lista)
             {
-                ins.Ejecutar(nuevo);
+                if (ins.getTipo().Equals(Tipo.Instruccion.Break))
+                {
+                    Sintactico.pilaBreak.Pop();
+                }
+                else if (ins.getTipo().Equals(Tipo.Instruccion.Continue))
+                {
+                    Sintactico.pilaContinue.Pop();
+                }
+                else
+                {
+                    ins.Ejecutar(nuevo);
+
+                    if (Sintactico.pilaBreak.Count < num)
+                    {
+                        break;
+                    }
+                    else if (Sintactico.pilaContinue.Count < numC)
+                    {
+                        continue;
+                    }
+                }
             }
         }
 

@@ -46,6 +46,11 @@ namespace PyUSAC.Instrucciones
                 while (cond.getValor().ToString().ToLower().Equals("true"))
                 {//Mientras la condicion se cumpla ejecutaremos el bloque
                     //Entorno entAux = new Entorno(entornoFor);
+                    if (Sintactico.pilaBreak.Count == 0 || !Sintactico.pilaBreak.Peek().Equals(this))
+                    {
+                        break;//Si ya no se encuentra la instruccion es porque hubo un break
+                    }
+
                     bloque.Ejecutar(entornoFor);
                     resolve.resolverExpresion(actualizacion, entornoFor);//actualizar
                     cond = resolve.resolverExpresion(condicion, entornoFor);
@@ -54,11 +59,13 @@ namespace PyUSAC.Instrucciones
                     {
                         cond = new Expresion(Tipo.Valor.booleano, false);
                     }
-
                 }
             }
 
-
+            if (Sintactico.pilaBreak.Count != 0 && Sintactico.pilaBreak.Peek().Equals(this))
+            {
+                Sintactico.pilaBreak.Pop();//Si termino la interacion sin break, indicamos que salimos
+            }
         }
 
         public Tipo.Instruccion getTipo()
