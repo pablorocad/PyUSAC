@@ -14,16 +14,15 @@ namespace PyUSAC.Instrucciones
     {
 
         ParseTreeNode instrucciones;
-        Entorno nuevo;
 
-        public Bloque(ParseTreeNode instrucciones, Entorno ent)
+        public Bloque(ParseTreeNode instrucciones)
         {
             this.instrucciones = instrucciones;
-            this.nuevo = ent;
         }
 
         public void Ejecutar(Entorno ent)
         {
+            Entorno nuevo = new Entorno(ent);
             SegundaPasada leer = new SegundaPasada();
             LinkedList<Instruccion> lista;
 

@@ -24,9 +24,10 @@ namespace PyUSAC.Instrucciones
         public void Ejecutar(Entorno ent)
         {
             Resolve resolve = new Resolve();
-            Expresion hijo1 = resolve.resolverExpresion(id, ent);
+            String name = id.ToString().Split(' ')[0];
+            Expresion hijo1 = ((Expresion)ent.search(name, id.Span.Location.Line, id.Span.Location.Column).getContenido());
             Double num1 = 0;
-            if (id.ChildNodes.ElementAt(0).Term.ToString().Equals("identificador"))
+            if (id.Term.ToString().Equals("identificador"))
             {
                 if (aum_dec)
                 {
@@ -35,7 +36,7 @@ namespace PyUSAC.Instrucciones
                         num1 = double.Parse(hijo1.getValor().ToString());
                         num1++;
 
-                        ent.edit(id.ChildNodes.ElementAt(0).ToString().Split(' ')[0],
+                        ent.edit(name,
                             new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.numero, num1)));
                     }
                     else if (hijo1.getTipo().Equals(Tipo.Valor.caracter))
@@ -43,7 +44,7 @@ namespace PyUSAC.Instrucciones
                         num1 = Convert.ToChar(hijo1.getValor().ToString());
                         num1++;
 
-                        ent.edit(id.ChildNodes.ElementAt(0).ToString().Split(' ')[0],
+                        ent.edit(name,
                             new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.caracter, (char)num1)));
                     }
                 }
@@ -55,12 +56,12 @@ namespace PyUSAC.Instrucciones
                             num1 = double.Parse(hijo1.getValor().ToString());
                             num1--;
 
-                            ent.edit(id.ChildNodes.ElementAt(0).ToString().Split(' ')[0],
+                            ent.edit(name,
                                 new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.numero, num1)));
                         }
                         else if (hijo1.getTipo().Equals(Tipo.Valor.caracter))
                         {
-                            ent.edit(id.ChildNodes.ElementAt(0).ToString().Split(' ')[0],
+                            ent.edit(name,
                                 new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.caracter, (char)num1)));
                         }
                     

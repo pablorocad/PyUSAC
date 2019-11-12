@@ -20,6 +20,7 @@ namespace PyUSAC.Analisis
         LinkedList<Instruccion> listaIns;
         public static LinkedList<String> listaImp;
         Resolve resolve = new Resolve();
+        public static Stack<Instruccion> pilaBreak = new Stack<Instruccion>();
 
         public Sintactico()
         {
@@ -38,10 +39,11 @@ namespace PyUSAC.Analisis
             Gramatica gramatica = new Gramatica();
             LanguageData lenguaje = new LanguageData(gramatica);
 
-            foreach (var item in lenguaje.Errors)
-            {
-                Console.WriteLine(item);
-            }
+            //foreach (var item in lenguaje.Errors)
+            //{
+            //    Console.WriteLine(item);
+            //    //Console.WriteLine(item.State + " " + item.GetType().ToString());
+            //}
 
             Parser parser = new Parser(lenguaje);
             ParseTree arbolAST = parser.Parse(cadena);
@@ -66,6 +68,11 @@ namespace PyUSAC.Analisis
             if (raiz != null)
             {
                 return true;
+            }
+
+            foreach (var item in arbolAST.ParserMessages)
+            {
+                listaErrores.Add(new Error(Tipo.Error.sintactico, item.Message, item.Location.Line, item.Location.Column));
             }
 
             return false;
@@ -110,6 +117,10 @@ namespace PyUSAC.Analisis
         public void ejecutarArbol(ParseTreeNode temp)
         {
             Entorno global = new Entorno(null);
+
+            PrimeraPasada primera = new PrimeraPasada();
+            primera.first(temp, global);
+
             SegundaPasada segunda = new SegundaPasada();
             listaIns = segunda.second(temp, global);
 

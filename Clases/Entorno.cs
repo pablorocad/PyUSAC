@@ -12,7 +12,6 @@ namespace PyUSAC.Clases
     {
 
         public Dictionary<String, Simbolo> tabla;
-
         Entorno anterior;
 
         public Entorno(Entorno ant)
@@ -28,7 +27,7 @@ namespace PyUSAC.Clases
                 Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
                     "La variable " + name + " ya esxiste", fila, columna));
 
-                MessageBox.Show("La variable " + name + " ya esxiste");
+                //MessageBox.Show("La variable " + name + " ya esxiste");
                 return false;
             }
 
@@ -53,7 +52,7 @@ namespace PyUSAC.Clases
             {
                 Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
                 "La variable " + name + " no existe", 0, 0));
-                MessageBox.Show("La variable " + name + " no esxiste");
+                //MessageBox.Show("La variable " + name + " no esxiste");
             }
         }
 
@@ -70,7 +69,7 @@ namespace PyUSAC.Clases
             }
             Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
                 "La variable " + name + " no existe", fila, columna));
-            MessageBox.Show("La variable " + name + " no esxiste");
+            //MessageBox.Show("La variable " + name + " no esxiste");
             return null;
         }
 

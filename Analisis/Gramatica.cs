@@ -42,8 +42,13 @@ namespace PyUSAC.Analisis
             var rfor = ToTerm("for");
             var rswitch = ToTerm("switch");
             var rcase = ToTerm("case");
+            var rcontinue = ToTerm("continue");
             var rbreak = ToTerm("break");
             var rdefault = ToTerm("default");
+            var rclass = ToTerm("class");
+            var rfunction = ToTerm("function");
+            var rvoid = ToTerm("void");
+            var rreturn = ToTerm("return");
 
             //Simbolos-------------------------------------------------------------------
             var igual = ToTerm("=");
@@ -76,16 +81,16 @@ namespace PyUSAC.Analisis
             #endregion
 
             #region Precedencia
-            RegisterOperators(1, xor);
-            RegisterOperators(2, or);
-            RegisterOperators(3, and);
+            RegisterOperators(1, Associativity.Left, xor);
+            RegisterOperators(2, Associativity.Left, or);
+            RegisterOperators(3, Associativity.Left, and);
             RegisterOperators(4, igualigual, desigual);
             RegisterOperators(5, mayor, menor, mayorigual, menorigual);
-            RegisterOperators(6, mas, menos);
-            RegisterOperators(7, multi, div);
+            RegisterOperators(6, Associativity.Left, mas, menos);
+            RegisterOperators(7, Associativity.Left, multi, div);
             RegisterOperators(8, potencia);
-            RegisterOperators(9, not);
-            RegisterOperators(10, aumento, decremento);
+            RegisterOperators(9, Associativity.Right, not);
+            RegisterOperators(10, Associativity.Right, aumento, decremento);
             #endregion
 
             #region No Terminales
@@ -94,8 +99,17 @@ namespace PyUSAC.Analisis
                 S = new NonTerminal("S"),
                 L_INS = new NonTerminal("L_INS"),
                 INS = new NonTerminal("INS"),
-                SUBINS = new NonTerminal("SUBINS"),
+                INSB = new NonTerminal("INSB"),
+                L_INSB = new NonTerminal("L_INSB"),
 
+                BLOQUE_CL = new NonTerminal("BLOQUE_CL"),
+                L_INS_CL = new NonTerminal("L_INS_CL"),
+                INS_CL = new NonTerminal("INS_CL"),
+
+                BLOQUE_MET = new NonTerminal("BLOQUE_MET"),
+                L_INS_MET = new NonTerminal("L_INS_MET"),
+                INS_MET = new NonTerminal("INS_MET"),
+                RETURN = new NonTerminal("RETURN"),
 
                 DECLARACION = new NonTerminal("DECLARACION"),
                 L_DIM = new NonTerminal("L_DIM"),
@@ -118,9 +132,15 @@ namespace PyUSAC.Analisis
                 SWITCH = new NonTerminal("SWITCH"),
                 BLOQUE_SW = new NonTerminal("BLOQUE_SW"),
                 DEFAULT = new NonTerminal("DEFAULT"),
-                BREAK = new NonTerminal("BREAK"),
+                BREAK_CONTINUE = new NonTerminal("BREAK_CONTINUE"),
+                CLASE = new NonTerminal("CLASE"),
+                METODO = new NonTerminal("METODO"),
+                FUNCION = new NonTerminal("FUNCION"),
+                L_PAR = new NonTerminal("L_PAR"),
+                L_PARR = new NonTerminal("L_PARR"),
 
                 BLOQUE = new NonTerminal("BLOQUE"),
+                
                 L_ID = new NonTerminal("L_ID"),
                 ZI = new NonTerminal("ZI"),
                 ZI2 = new NonTerminal("ZI2"),
@@ -152,10 +172,31 @@ namespace PyUSAC.Analisis
                       | DO_WHILE
                       | FOR
                       | SWITCH
+                      | CLASE
+                      | METODO
+                      | FUNCION
                 ;
 
-            SUBINS.Rule = L_INS
-                        |Empty
+            L_INSB.Rule = L_INSB + INSB
+                        | INSB
+                        | Empty
+                ;
+
+            INSB.Rule = DECLARACION
+                      | LOG
+                      | ALERT
+                      | ASIGNACION
+                      | GRAPH
+                      | AUM_DEC
+                      | IF
+                      | WHILE
+                      | DO_WHILE
+                      | FOR
+                      | SWITCH
+                      | BREAK_CONTINUE
+                      | FUNCION
+                      | METODO
+                      | RETURN
                 ;
 
             DECLARACION.Rule = rvar + L_ID + puntocoma
@@ -203,15 +244,15 @@ namespace PyUSAC.Analisis
             GRAPH.Rule = rgraph + parizq + E + coma + E + parder + puntocoma
                 ;
 
-            AUM_DEC.Rule = E + aumento + puntocoma
-                      | E + decremento + puntocoma
+            AUM_DEC.Rule = identificador + aumento + puntocoma
+                      | identificador + decremento + puntocoma
                       ;
 
 
             IF.Rule = rif + parizq + E + parder + BLOQUE + ELSE
                 ;
 
-            BLOQUE.Rule = llaveizq + SUBINS + llaveder
+            BLOQUE.Rule = llaveizq + L_INSB + llaveder
                 ;
 
             ELSE.Rule = relse + IF
@@ -225,27 +266,50 @@ namespace PyUSAC.Analisis
             DO_WHILE.Rule = rdo + BLOQUE + rwhile + parizq + E + parder + puntocoma
                 ;
 
-            FOR.Rule = rfor + parizq + DEC_ASIG + puntocoma + E + puntocoma + E + parder + BLOQUE
+            FOR.Rule = rfor + parizq + DEC_ASIG + E + puntocoma + E + parder + BLOQUE
                 ;
 
-            DEC_ASIG.Rule = rvar + identificador + igual + E
-                          | identificador + igual + E
+            DEC_ASIG.Rule = DECLARACION
+                          | ASIGNACION
                           ;
 
-            SWITCH.Rule = rswitch + parizq + identificador + parder + llaveizq + BLOQUE_SW + DEFAULT + llaveder
+            SWITCH.Rule = rswitch + parizq + E + parder + llaveizq + BLOQUE_SW + DEFAULT + llaveder
                 ;
 
-            BLOQUE_SW.Rule = BLOQUE_SW + rcase + E + dospuntos + SUBINS + BREAK
-                            | rcase + E + dospuntos + SUBINS + BREAK
+            BLOQUE_SW.Rule = BLOQUE_SW + rcase + E + dospuntos + L_INSB + BREAK_CONTINUE
+                            | rcase + E + dospuntos + L_INSB + BREAK_CONTINUE
                             ;
 
-            BREAK.Rule = rbreak + puntocoma
+            BREAK_CONTINUE.Rule = rbreak + puntocoma
+                        | rcontinue + puntocoma
                         | Empty
                         ;
 
-            DEFAULT.Rule = rdefault + dospuntos + SUBINS + BREAK
+            DEFAULT.Rule = rdefault + dospuntos + L_INSB + BREAK_CONTINUE
                           | Empty
                           ;
+
+            CLASE.Rule = rclass + identificador + BLOQUE
+                ;
+
+
+            METODO.Rule = rfunction + rvoid + identificador + parizq + L_PARR + parder + BLOQUE
+                ;
+
+
+            FUNCION.Rule = rfunction + identificador + parizq + L_PARR + parder + BLOQUE
+                ;
+
+            L_PARR.Rule = L_PAR
+                        | Empty
+                        ;
+
+            L_PAR.Rule = L_PAR + coma + rvar + identificador
+                        | rvar + identificador
+                        ;
+
+            RETURN.Rule = rreturn + E + puntocoma
+                ;
 
             E.Rule = E + mas + E
                     | E + menos + E

@@ -15,6 +15,7 @@ namespace PyUSAC.Analisis
     {
         Resolve resolve = new Resolve();
         public static List<Error> listaErrores = new List<Error>();
+        
 
         /*Se encarga de ejecutar lo que esta fuera de clases, metodos, funciones y leugo ejecuta el main()*/
         public LinkedList<Instruccion> second(ParseTreeNode temp, Entorno ent)
@@ -55,11 +56,28 @@ namespace PyUSAC.Analisis
                     }
                     return Ins;
 
-                case "SUBINS":
+                case "L_INSB":
 
-                    if (temp.ChildNodes.Count != 0)//Si trae mas instrucciones
+                    if (temp.ChildNodes.Count == 2)//Si trae mas instrucciones
                     {
-                        Ins = second(temp.ChildNodes.ElementAt(0), ent);
+                        Ins = second(temp.ChildNodes.ElementAt(0), ent);//Tomamos la lista de instrucciones
+
+                        Instruccion s = instructions(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);//Guardamos la instrucciones
+                        if (s != null)//Para excluir declaracion y asignacion
+                        {
+                            Ins.AddLast(s);
+                        }
+                    }
+                    else if (temp.ChildNodes.Count == 1)//La primera instruccion
+                    {
+                        Ins = new LinkedList<Instruccion>();//Creamso la lista de instrucciones
+                        Instruccion s = instructions(temp.ChildNodes.ElementAt(0).ChildNodes.ElementAt(0), ent);//Guardamos la instrucciones
+
+                        if (s != null)//Para excluir declaracion y asignacion
+                        {
+                            Ins.AddLast(s);
+                        }
+
                     }
                     return Ins;
 
@@ -119,9 +137,8 @@ namespace PyUSAC.Analisis
                     break;
 
                 case "BLOQUE":
-                    Entorno nuevo = new Entorno(ent);
                     ParseTreeNode lista = temp.ChildNodes.ElementAt(1);
-                    return new Bloque(lista, nuevo);
+                    return new Bloque(lista);
                     break;
 
                 case "IF":
@@ -151,7 +168,35 @@ namespace PyUSAC.Analisis
                     Instruccion bloqueDO = instructions(temp.ChildNodes.ElementAt(1), ent);
 
                     return new Do_While(condicionDO, bloqueDO);
+
+                case "FOR":
+                    ParseTreeNode inicializacion = temp.ChildNodes.ElementAt(2).ChildNodes.ElementAt(0);
+                    ParseTreeNode condicion = temp.ChildNodes.ElementAt(3);
+                    ParseTreeNode actualizacion = temp.ChildNodes.ElementAt(5);
+
+                    Entorno entornoFor = new Entorno(ent);//Creamos el entorno de la iteación del For
+
+                    Instruccion bloqueFOR = instructions(temp.ChildNodes.ElementAt(7), entornoFor);
+                    //Mandamos a traer el bloque de instrucciones for
+
+                    return new For(inicializacion, condicion, actualizacion, entornoFor, bloqueFOR);
+
+                case "SWITCH":
+                    ParseTreeNode entrada = temp.ChildNodes.ElementAt(2);
+                    LinkedList<Case> listaCase = BLOQUE_SW(temp.ChildNodes.ElementAt(5), ent);
+                    Instruccion def = null;
+
+                    if (temp.ChildNodes.ElementAt(6).ChildNodes.Count != 0)
+                    {
+                        Entorno DefEnt = new Entorno(ent);
+                        ParseTreeNode listaDef = temp.ChildNodes.ElementAt(6).ChildNodes.ElementAt(2);
+                        Bloque bloque = new Bloque(listaDef);
+                        def = bloque;
+                    }
+
+                    return new Switch(entrada, listaCase, def);
                     break;
+
             }
             return null;
         }
@@ -248,7 +293,48 @@ namespace PyUSAC.Analisis
         }
 
         
+        public LinkedList<Case> BLOQUE_SW(ParseTreeNode temp, Entorno ent)
+        {
+            LinkedList<Case> listaCase = null;
 
+            if (temp.ChildNodes.Count == 6)
+            {
+                listaCase = BLOQUE_SW(temp.ChildNodes.ElementAt(0), ent);
+                ParseTreeNode condicion = temp.ChildNodes.ElementAt(2);
+
+                Entorno nuevo = new Entorno(ent);
+                ParseTreeNode lista = temp.ChildNodes.ElementAt(4);
+                Bloque bloque = new Bloque(lista);
+
+                Case @case = new Case(condicion, bloque);
+                if (temp.ChildNodes.ElementAt(5).ChildNodes.Count != 0)
+                {
+                    @case.setBreak(true);
+                }
+
+                listaCase.AddLast(@case);
+            }
+            else if (temp.ChildNodes.Count == 5)
+            {
+                listaCase = new LinkedList<Case>();
+                ParseTreeNode condicion = temp.ChildNodes.ElementAt(1);
+
+                Entorno nuevo = new Entorno(ent);
+                ParseTreeNode lista = temp.ChildNodes.ElementAt(3);
+                Bloque bloque = new Bloque(lista);
+
+                Case @case = new Case(condicion, bloque);
+                if (temp.ChildNodes.ElementAt(4).ChildNodes.Count != 0)
+                {
+                    @case.setBreak(true);
+                }
+
+                listaCase.AddLast(@case);
+
+            }
+
+            return listaCase;
+        }
         
 
     }

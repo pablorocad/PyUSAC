@@ -28,16 +28,26 @@ namespace PyUSAC.Instrucciones
             Expresion condicion = resolve.resolverExpresion(cond, ent);
             if (!condicion.getTipo().Equals(Tipo.Valor.rnull))
             {
-                if (condicion.getValor().ToString().ToLower().Equals("true"))
+                if (condicion.getTipo().Equals(Tipo.Valor.booleano))
                 {
-                    bloque.Ejecutar(ent);
+                    if (condicion.getValor().ToString().ToLower().Equals("true"))
+                    {
+                        bloque.Ejecutar(ent);
+
+                    }
+                    else
+                    {
+                        if (relse != null)
+                        {
+                            relse.Ejecutar(ent);
+                        }
+                    }
                 }
                 else
                 {
-                    if (relse != null)
-                    {
-                        relse.Ejecutar(ent);
-                    }
+                    int linea = cond.Span.Location.Line;
+                    int columna = cond.Span.Location.Column;
+                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La Expresion debe ser booleana", linea, columna));
                 }
             }
         }

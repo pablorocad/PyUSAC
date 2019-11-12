@@ -54,10 +54,12 @@
   <ItemGroup>
     <Compile Include="Analisis\graficarArbol.cs" />
     <Compile Include="Analisis\Gramatica.cs" />
+    <Compile Include="Analisis\PrimeraPasada.cs" />
     <Compile Include="Analisis\Resolve.cs" />
     <Compile Include="Analisis\SegundaPasada.cs" />
     <Compile Include="Analisis\Sintactico.cs" />
     <Compile Include="Clases\ArbolArreglo.cs" />
+    <Compile Include="Clases\Case.cs" />
     <Compile Include="Clases\Declaracion.cs" />
     <Compile Include="Clases\ElementoArreglo.cs" />
     <Compile Include="Clases\Entorno.cs" />
@@ -66,6 +68,9 @@
     <Compile Include="Clases\NodoArreglo.cs" />
     <Compile Include="Clases\Simbolo.cs" />
     <Compile Include="Clases\Tipo.cs" />
+    <Compile Include="CMF\Clase.cs" />
+    <Compile Include="CMF\Funcion.cs" />
+    <Compile Include="CMF\Metodo.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,10 +83,13 @@
     <Compile Include="Instrucciones\Bloque.cs" />
     <Compile Include="Instrucciones\Dec.cs" />
     <Compile Include="Instrucciones\Do_While.cs" />
+    <Compile Include="Instrucciones\For.cs" />
     <Compile Include="Instrucciones\Graph.cs" />
     <Compile Include="Instrucciones\IF.cs" />
     <Compile Include="Instrucciones\Log.cs" />
+    <Compile Include="Instrucciones\Switch.cs" />
     <Compile Include="Instrucciones\While.cs" />
+    <Compile Include="Interfaces\Bloques.cs" />
     <Compile Include="Interfaces\Instruccion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
