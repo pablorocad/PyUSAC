@@ -21,11 +21,11 @@ namespace PyUSAC.Instrucciones
             this.aum_dec = aum_dec;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
             Resolve resolve = new Resolve();
             String name = id.ToString().Split(' ')[0];
-            Expresion hijo1 = ((Expresion)ent.search(name, id.Span.Location.Line, id.Span.Location.Column).getContenido());
+            Expresion hijo1 = ((Expresion)ent.search(name, id.Span.Location.Line, id.Span.Location.Column, true).getContenido());
             Double num1 = 0;
             if (id.Term.ToString().Equals("identificador"))
             {
@@ -67,6 +67,7 @@ namespace PyUSAC.Instrucciones
                     
                 }
             }
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

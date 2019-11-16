@@ -35,7 +35,7 @@ namespace PyUSAC.Instrucciones
             return grafo;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
             Resolve resolve = new Resolve();
             Expresion extension1 = resolve.resolverExpresion(name, ent);
@@ -84,6 +84,7 @@ namespace PyUSAC.Instrucciones
                 MessageBox.Show("Graph(Cadena,Cadena), Se esperaba una cadena" +
                     " en el primer parametro");
             }
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

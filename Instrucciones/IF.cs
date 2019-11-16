@@ -22,24 +22,27 @@ namespace PyUSAC.Instrucciones
             this.relse = relse;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
             Resolve resolve = new Resolve();
             Expresion condicion = resolve.resolverExpresion(cond, ent);
+
+            Instruccion aux = null;
+
             if (!condicion.getTipo().Equals(Tipo.Valor.rnull))
             {
                 if (condicion.getTipo().Equals(Tipo.Valor.booleano))
                 {
                     if (condicion.getValor().ToString().ToLower().Equals("true"))
                     {
-                        bloque.Ejecutar(ent);
+                        aux = bloque.Ejecutar(ent);
 
                     }
                     else
                     {
                         if (relse != null)
                         {
-                            relse.Ejecutar(ent);
+                            aux = relse.Ejecutar(ent);
                         }
                     }
                 }
@@ -50,6 +53,7 @@ namespace PyUSAC.Instrucciones
                     Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La Expresion debe ser booleana", linea, columna));
                 }
             }
+            return aux;
         }
 
         public Tipo.Instruccion getTipo()

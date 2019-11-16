@@ -21,7 +21,7 @@ namespace PyUSAC.Instrucciones
             this.exp = exp;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
             if (exp != null)
             {
@@ -29,6 +29,7 @@ namespace PyUSAC.Instrucciones
                 Expresion aux = resolve.resolverExpresion(exp, ent);
                 MessageBox.Show(aux.getValor().ToString());
             }
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

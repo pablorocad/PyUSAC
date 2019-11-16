@@ -21,7 +21,7 @@ namespace PyUSAC.Instrucciones
             this.exp = exp;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
             if (exp != null)
             {
@@ -32,6 +32,7 @@ namespace PyUSAC.Instrucciones
                     Sintactico.listaImp.AddLast(aux.getValor().ToString());
                 }
             }
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

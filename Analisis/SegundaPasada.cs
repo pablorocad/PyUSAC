@@ -1,5 +1,6 @@
 ﻿using Irony.Parsing;
 using PyUSAC.Clases;
+using PyUSAC.CMF;
 using PyUSAC.Instrucciones;
 using PyUSAC.Interfaces;
 using System;
@@ -104,16 +105,16 @@ namespace PyUSAC.Analisis
 
                 case "ASIGNACION":
 
-                    String name = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
+                    ParseTreeNode asig = temp.ChildNodes.ElementAt(0);
                     ParseTreeNode expAs = temp.ChildNodes.ElementAt(3);
 
                     if (temp.ChildNodes.ElementAt(1).ChildNodes.Count != 0)
                     {
                         ParseTreeNode l_dim = temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0);
-                        return new Asignacion(name, l_dim, expAs);
+                        return new Asignacion(asig, l_dim, expAs);
                     }
 
-                        return new Asignacion(name, expAs);
+                        return new Asignacion(asig, expAs);
 
                 case "GRAPH":
                     ParseTreeNode nameGraph = temp.ChildNodes.ElementAt(2);
@@ -203,10 +204,22 @@ namespace PyUSAC.Analisis
                 case "CONTINUE":
                     return new Continue();
 
+                case "RETURN":
+                    return new Return(temp.ChildNodes.ElementAt(1));
 
+                case "LLAMADA":
+
+                    ParseTreeNode lla = temp.ChildNodes.ElementAt(0);
+                    ParseTreeNode parametros = temp.ChildNodes.ElementAt(1);
+
+                    return new Llamada(lla, parametros);
+
+                    break;
             }
             return null;
         }
+
+        
 
         public LinkedList<Declaracion> L_ID(ParseTreeNode temp, Entorno ent)
         {
@@ -283,7 +296,7 @@ namespace PyUSAC.Analisis
                             valores = temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(1).ChildNodes.ElementAt(1);
                             //Mandamos a traer los valores
 
-                            Console.WriteLine();
+                            //Console.WriteLine();
                         }
 
                         dec = new Declaracion(id, l_dim, valores);

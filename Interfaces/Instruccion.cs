@@ -12,7 +12,7 @@ namespace PyUSAC.Interfaces
 
         Tipo.Instruccion getTipo();
 
-        void Ejecutar(Entorno ent);
+        Instruccion Ejecutar(Entorno ent);
 
     }
 }

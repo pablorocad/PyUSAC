@@ -27,7 +27,7 @@ namespace PyUSAC.Clases
             this.identificador = identificador;
             this.dimensiones = dimensiones;
             exp = valores;
-            this.tipo = Tipo.Simbolo.arreglo;
+            this.tipo = Tipo.Simbolo.variable;
         }
 
         public String getIdentificador()

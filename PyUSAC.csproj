@@ -66,6 +66,7 @@
     <Compile Include="Clases\Error.cs" />
     <Compile Include="Clases\Expresion.cs" />
     <Compile Include="Clases\NodoArreglo.cs" />
+    <Compile Include="Clases\Objeto.cs" />
     <Compile Include="Clases\Simbolo.cs" />
     <Compile Include="Clases\Tipo.cs" />
     <Compile Include="CMF\Clase.cs" />
@@ -88,7 +89,9 @@
     <Compile Include="Instrucciones\For.cs" />
     <Compile Include="Instrucciones\Graph.cs" />
     <Compile Include="Instrucciones\IF.cs" />
+    <Compile Include="Instrucciones\Llamada.cs" />
     <Compile Include="Instrucciones\Log.cs" />
+    <Compile Include="Instrucciones\Return.cs" />
     <Compile Include="Instrucciones\Switch.cs" />
     <Compile Include="Instrucciones\While.cs" />
     <Compile Include="Interfaces\Bloques.cs" />

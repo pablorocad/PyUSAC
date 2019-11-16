@@ -20,41 +20,26 @@ namespace PyUSAC.Instrucciones
             this.instrucciones = instrucciones;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
-            int num = Sintactico.pilaBreak.Count;
-            int numC = Sintactico.pilaContinue.Count;
-
             Entorno nuevo = new Entorno(ent);
             SegundaPasada leer = new SegundaPasada();
             LinkedList<Instruccion> lista;
 
             lista = leer.second(instrucciones, nuevo);
-
-            foreach(Instruccion ins in lista)
+            Instruccion aux;
+            foreach (Instruccion ins in lista)
             {
-                if (ins.getTipo().Equals(Tipo.Instruccion.Break))
-                {
-                    Sintactico.pilaBreak.Pop();
-                }
-                else if (ins.getTipo().Equals(Tipo.Instruccion.Continue))
-                {
-                    Sintactico.pilaContinue.Pop();
-                }
-                else
-                {
-                    ins.Ejecutar(nuevo);
 
-                    if (Sintactico.pilaBreak.Count < num)
-                    {
-                        break;
-                    }
-                    else if (Sintactico.pilaContinue.Count < numC)
-                    {
-                        continue;
-                    }
+                aux = ins.Ejecutar(nuevo);
+
+                if (aux != null)
+                {
+                    return aux;
                 }
             }
+
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

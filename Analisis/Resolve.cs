@@ -1,5 +1,7 @@
 ﻿using Irony.Parsing;
 using PyUSAC.Clases;
+using PyUSAC.CMF;
+using PyUSAC.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +34,31 @@ namespace PyUSAC.Analisis
             return lista;
         }
 
+        public Simbolo LLAMADAP(ParseTreeNode temp, Entorno ent)
+        {
+            Simbolo sim = null;
+            if (temp.ChildNodes.Count == 1)
+            {
+                String name = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
+                sim = ent.search(name, temp.Span.Location.Line, temp.Span.Location.Column, true);
+            }
+            else if (temp.ChildNodes.Count == 3)
+            {
+                sim = LLAMADAP(temp.ChildNodes.ElementAt(0), ent);
+                Expresion exp = (Expresion)sim.getContenido();
+                if (exp.getTipo().Equals(Tipo.Valor.objeto))
+                {
+                    Entorno Eaux = (Entorno)exp.getValor();
+                    sim = LLAMADAP(temp.ChildNodes.ElementAt(2), Eaux);
+                }
+                else
+                {
+                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "No es entorno",
+                        temp.Span.Location.Line, temp.Span.Location.Column));
+                }
+            }
+            return sim;
+        }
         public LinkedList<NodoArreglo> VAL_ARR(ParseTreeNode temp, Entorno ent)
         {
             LinkedList<NodoArreglo> lista = new LinkedList<NodoArreglo>();
@@ -86,6 +113,61 @@ namespace PyUSAC.Analisis
             return l_exp;
         }
 
+        public Simbolo asignacion(ParseTreeNode temp, Entorno ent)
+        {
+            Simbolo simAux = null;
+
+            if (temp.ChildNodes.Count == 1)
+            {
+
+                String name = temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0];
+                simAux = ent.search(name, 0, 0, true);
+                //Expresion expAux = (Expresion)simAux.getContenido();
+                //if (!expAux.getTipo().Equals(Tipo.Valor.objeto))
+                //{
+                //if (l_dim != null)
+                //{
+                //    //Expresion exp = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                //    if (expAux != null)
+                //    {
+                //        Expresion expAs = resolverExpresion(exp, ent);
+                //        ArbolArreglo arbolAux = (ArbolArreglo)((Expresion)simAux.getContenido()).getValor();
+
+                //        LinkedList<Expresion> dimensiones = L_DIM(l_dim, ent);
+
+                //        arbolAux.setValor(expAs, dimensiones);
+                //        Simbolo simAs = new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.arreglo, arbolAux));
+
+                //        //ent.edit(name, simAs);
+                //    }
+                //}
+                //else if (l_dim == null)
+                //{
+                //    Expresion expAs = resolverExpresion(exp, ent);
+                //    simAux = new Simbolo(Tipo.Simbolo.variable, expAs);
+
+                //    //ent.edit(name, simAux);
+                //}
+                //}
+                //else
+                //{
+                return simAux;
+                //}
+
+            }
+            else if (temp.ChildNodes.Count == 3)
+            {
+                simAux = asignacion(temp.ChildNodes.ElementAt(0), ent);
+
+                if (simAux != null)
+                {
+                    Simbolo nuevo = asignacion(temp.ChildNodes.ElementAt(2), (Entorno)((Expresion)simAux.getContenido()).getValor());
+                    simAux = nuevo;
+                }
+            }
+
+                return simAux;
+        }
 
         public Expresion resolverExpresion(ParseTreeNode temp, Entorno ent)
         {
@@ -100,71 +182,277 @@ namespace PyUSAC.Analisis
                     String operador = temp.ChildNodes.ElementAt(1).ToString().Split(' ')[0];
                     Expresion hijo1, hijo2;
 
-                    try
-                    {
-                        hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
-                    }
-                    catch (Exception e)
-                    {
-                        hijo1 = new Expresion(Tipo.Valor.rnull, null);
-                    }
+                    //try
+                    //{
+                    //    hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                    //}
 
-                    try
-                    {
-                        hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
-                    }
-                    catch (Exception e)
-                    {
-                        hijo2 = new Expresion(Tipo.Valor.rnull, null);
-                    }
+                    //try
+                    //{
+                    //    hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                    //}
 
                     Object nuevoValor = null;
-                    if (!hijo1.getTipo().Equals(Tipo.Valor.rnull) && !hijo2.getTipo().Equals(Tipo.Valor.rnull))
+                    switch (operador)
                     {
-                        switch (operador)
-                        {
-                            case "+":
-                                //CADENAS
-                                if (hijo1.getTipo().Equals(Tipo.Valor.cadena) || hijo2.getTipo().Equals(Tipo.Valor.cadena))
+                        case "+":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            //CADENAS
+                            if (hijo1.getTipo().Equals(Tipo.Valor.cadena) || hijo2.getTipo().Equals(Tipo.Valor.cadena))
+                            {
+                                nuevoValor = hijo1.getValor().ToString() + "" + hijo2.getValor().ToString();
+                                return new Expresion(Tipo.Valor.cadena, nuevoValor);
+                            }
+                            //NUMEROS
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) + Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) + car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo2.getValor().ToString()) + car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 + car2;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.rnull) || hijo2.getTipo().Equals(Tipo.Valor.rnull))
+                            {
+                                nuevoValor = hijo1.getValor().ToString() + "" + hijo2.getValor().ToString();
+                                return new Expresion(Tipo.Valor.cadena, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede sumarse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede sumarse con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "-":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            //NUMEROS
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) - Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) - car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car - Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 - car2;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede restarse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede restarse con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "*":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            //NUMEROS
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) * Double.Parse(hijo2.getValor().ToString());
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) * car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo2.getValor().ToString()) * car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 * car2;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede multiplicarse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede multiplicarse con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "/":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            //NUMEROS
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                if (!hijo2.getValor().ToString().Equals("0"))
                                 {
-                                    nuevoValor = hijo1.getValor().ToString() + "" + hijo2.getValor().ToString();
-                                    return new Expresion(Tipo.Valor.cadena, nuevoValor);
-                                }
-                                //NUMEROS
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) + Double.Parse(hijo2.getValor().ToString());
+                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) / Double.Parse(hijo2.getValor().ToString());
                                     nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
 
                                     return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) + car;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo2.getValor().ToString()) + car;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 + car2;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
                                 }
                                 else
                                 {
@@ -172,50 +460,32 @@ namespace PyUSAC.Analisis
                                     int columna = temp.Span.Location.Column;
 
                                     Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede sumarse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+                                        + ". No puede dividirse en 0", linea, columna));
 
                                     //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede sumarse con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
+                                    //    + ". No puede dividirse en 0");
+                                    return new Expresion(Tipo.Valor.rnull, "");
                                 }
-                                break;
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
 
-                            case "-":
-                                //NUMEROS
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) - Double.Parse(hijo2.getValor().ToString());
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) / car;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
 
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) - car;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                if (!hijo2.getValor().ToString().Equals("0"))
                                 {
                                     double car = Convert.ToChar(hijo1.getValor().ToString());
 
-                                    nuevoValor = car - Double.Parse(hijo2.getValor().ToString());
+                                    nuevoValor = car / Double.Parse(hijo2.getValor().ToString());
                                     nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
 
                                     return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 - car2;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
                                 }
                                 else
                                 {
@@ -223,557 +493,710 @@ namespace PyUSAC.Analisis
                                     int columna = temp.Span.Location.Column;
 
                                     Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede restarse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+                                        + ". No puede dividirse en 0", linea, columna));
 
                                     //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede restarse con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
+                                    //    + ". No puede dividirse en 0");
+                                    return new Expresion(Tipo.Valor.rnull, "");
                                 }
-                                break;
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
 
-                            case "*":
-                                //NUMEROS
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                                nuevoValor = car1 / car2;
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede dividirse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede dividirse con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "pow":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            //NUMEROS
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Math.Pow(Double.Parse(hijo1.getValor().ToString()), Double.Parse(hijo2.getValor().ToString()));
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Math.Pow(Double.Parse(hijo1.getValor().ToString()), car);
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = Math.Pow(car, Double.Parse(hijo2.getValor().ToString()));
+                                nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
+
+                                return new Expresion(Tipo.Valor.numero, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Math.Pow(car1, car2);
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede elevarse a la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede elevarse a la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case ">":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) > Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) > car;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car > Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 > car2;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (>) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (>) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "<":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) < Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) < car;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car < Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 < car2;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (<) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (<) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case ">=":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) >= Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) >= car;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car >= Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 >= car2;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (>=) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (>=) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "<=":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) <= Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) <= car;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car <= Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 <= car2;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (<=) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (<=) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "==":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.cadena) || hijo2.getTipo().Equals(Tipo.Valor.cadena))
+                            {
+                                nuevoValor = hijo1.getValor().ToString() == hijo2.getValor().ToString();
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) == Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) == car;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car == Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 == car2;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.rnull) || hijo2.getTipo().Equals(Tipo.Valor.rnull))
+                            {
+                                nuevoValor = hijo1.getValor().ToString() == hijo2.getValor().ToString();
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (==) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (==) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "<>":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.cadena) || hijo2.getTipo().Equals(Tipo.Valor.cadena))
+                            {
+                                nuevoValor = hijo1.getValor().ToString() != hijo2.getValor().ToString();
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) != Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = Double.Parse(hijo1.getValor().ToString()) != car;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
+                            {
+                                double car = Convert.ToChar(hijo1.getValor().ToString());
+
+                                nuevoValor = car != Double.Parse(hijo2.getValor().ToString());
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
+                            {
+                                double car1 = Convert.ToChar(hijo1.getValor().ToString());
+                                double car2 = Convert.ToChar(hijo2.getValor().ToString());
+
+                                nuevoValor = car1 != car2;
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            if (hijo1.getTipo().Equals(Tipo.Valor.rnull) || hijo2.getTipo().Equals(Tipo.Valor.rnull))
+                            {
+                                nuevoValor = hijo1.getValor().ToString() != hijo2.getValor().ToString();
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (<>) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (<>) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "&&":
+
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.booleano))
+                            {
+
+                                if (hijo1.getValor().ToString().ToLower().Equals("false"))
                                 {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) * Double.Parse(hijo2.getValor().ToString());
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) * car;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo2.getValor().ToString()) * car;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 * car2;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                                    return new Expresion(Tipo.Valor.booleano, false);
                                 }
                                 else
                                 {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede multiplicarse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede multiplicarse con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "/":
-                                //NUMEROS
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    if (!hijo2.getValor().ToString().Equals("0"))
+                                    try
                                     {
-                                        nuevoValor = Double.Parse(hijo1.getValor().ToString()) / Double.Parse(hijo2.getValor().ToString());
-                                        nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                        return new Expresion(Tipo.Valor.numero, nuevoValor);
+                                        hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
                                     }
-                                    else
+                                    catch (Exception e)
                                     {
-                                        int linea = temp.Span.Location.Line;
-                                        int columna = temp.Span.Location.Column;
-
-                                        Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                            + ". No puede dividirse en 0", linea, columna));
-
-                                        //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                        //    + ". No puede dividirse en 0");
-                                        return new Expresion(Tipo.Valor.rnull, null);
+                                        hijo2 = new Expresion(Tipo.Valor.rnull, "");
                                     }
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
 
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) / car;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    if (!hijo2.getValor().ToString().Equals("0"))
-                                    {
-                                        double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                        nuevoValor = car / Double.Parse(hijo2.getValor().ToString());
-                                        nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                        return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                    }
-                                    else
-                                    {
-                                        int linea = temp.Span.Location.Line;
-                                        int columna = temp.Span.Location.Column;
-
-                                        Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                            + ". No puede dividirse en 0", linea, columna));
-
-                                        //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                        //    + ". No puede dividirse en 0");
-                                        return new Expresion(Tipo.Valor.rnull, null);
-                                    }
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 / car2;
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede dividirse con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede dividirse con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "pow":
-                                //NUMEROS
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Math.Pow(Double.Parse(hijo1.getValor().ToString()), Double.Parse(hijo2.getValor().ToString()));
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Math.Pow(Double.Parse(hijo1.getValor().ToString()), car);
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = Math.Pow(car, Double.Parse(hijo2.getValor().ToString()));
-                                    nuevoValor = Math.Truncate(((Double)nuevoValor) * 100000) / 100000;//Truncamos el valor en cinco decimales
-
-                                    return new Expresion(Tipo.Valor.numero, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Math.Pow(car1, car2);
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede elevarse a la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede elevarse a la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case ">":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) > Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) > car;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = car > Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 > car2;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (>) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (>) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "<":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) < Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) < car;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = car < Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 < car2;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (<) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (<) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case ">=":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) >= Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) >= car;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = car >= Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 >= car2;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (>=) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (>=) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "<=":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) <= Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) <= car;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = car <= Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 <= car2;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (<=) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (<=) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "==":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.cadena) || hijo2.getTipo().Equals(Tipo.Valor.cadena))
-                                {
-                                    nuevoValor = hijo1.getValor().ToString() == hijo2.getValor().ToString();
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) == Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) == car;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = car == Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 == car2;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (==) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (==) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "<>":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.cadena) || hijo2.getTipo().Equals(Tipo.Valor.cadena))
-                                {
-                                    nuevoValor = hijo1.getValor().ToString() != hijo2.getValor().ToString();
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) != Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.numero) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = Double.Parse(hijo1.getValor().ToString()) != car;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.numero))
-                                {
-                                    double car = Convert.ToChar(hijo1.getValor().ToString());
-
-                                    nuevoValor = car != Double.Parse(hijo2.getValor().ToString());
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else if (hijo1.getTipo().Equals(Tipo.Valor.caracter) && hijo2.getTipo().Equals(Tipo.Valor.caracter))
-                                {
-                                    double car1 = Convert.ToChar(hijo1.getValor().ToString());
-                                    double car2 = Convert.ToChar(hijo2.getValor().ToString());
-
-                                    nuevoValor = car1 != car2;
-
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
-
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (<>) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
-
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (<>) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-
-                            case "&&":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.booleano) && hijo2.getTipo().Equals(Tipo.Valor.booleano))
-                                {
-
-                                    if (hijo1.getValor().ToString().ToLower().Equals("false"))
-                                    {
-                                        return new Expresion(Tipo.Valor.booleano, false);
-                                    }
-                                    else
+                                    if (hijo2.getTipo().Equals(Tipo.Valor.booleano))
                                     {
                                         nuevoValor = ((Boolean)hijo1.getValor()) && ((Boolean)hijo2.getValor());
                                     }
+                                    else
+                                    {
+                                        int linea = temp.Span.Location.Line;
+                                        int columna = temp.Span.Location.Column;
 
-                                    //
+                                        Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo2.getValor().ToString()
+                                            + ". Debe ser booleana para ser usada con el operador (&&)", linea, columna));
 
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                                        //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                        //    + ". No puede compararse (&&) con la expresion: " + hijo2.getValor().ToString());
+                                        return new Expresion(Tipo.Valor.rnull, "");
+                                    }
+                                }
+
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". Debe ser booleana para ser usada con el operador (&&)", linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (&&) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case "||":
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.booleano))
+                            {
+
+                                if (hijo1.getValor().ToString().ToLower().Equals("true"))
+                                {
+                                    return new Expresion(Tipo.Valor.booleano, true);
                                 }
                                 else
                                 {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
+                                    try
+                                    {
+                                        hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                                    }
 
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (&&) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+                                    if (hijo2.getTipo().Equals(Tipo.Valor.booleano))
+                                    {
+                                        nuevoValor = ((Boolean)hijo1.getValor()) || ((Boolean)hijo2.getValor());
+                                    }
+                                    else
+                                    {
+                                        int linea = temp.Span.Location.Line;
+                                        int columna = temp.Span.Location.Column;
 
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (&&) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
+                                        Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo2.getValor().ToString()
+                                            + ". Debe ser booleana para ser usada con el operador (||)", linea, columna));
+
+                                        //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                        //    + ". No puede compararse (&&) con la expresion: " + hijo2.getValor().ToString());
+                                        return new Expresion(Tipo.Valor.rnull, "");
+                                    }
                                 }
-                                break;
 
-                            case "||":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.booleano) && hijo2.getTipo().Equals(Tipo.Valor.booleano))
-                                {
-                                    nuevoValor = ((Boolean)hijo1.getValor()) || ((Boolean)hijo2.getValor());
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
 
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". Debe ser booleana para ser usada con el operador (||)", linea, columna));
 
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (||) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (&&) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
 
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (||) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
+                        case "^":
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
 
-                            case "^":
-                                if (hijo1.getTipo().Equals(Tipo.Valor.booleano) && hijo2.getTipo().Equals(Tipo.Valor.booleano))
-                                {
-                                    nuevoValor = ((Boolean)hijo1.getValor()) ^ ((Boolean)hijo2.getValor());
+                            try
+                            {
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo2 = new Expresion(Tipo.Valor.rnull, "");
+                            }
 
-                                    return new Expresion(Tipo.Valor.booleano, nuevoValor);
-                                }
-                                else
-                                {
-                                    int linea = temp.Span.Location.Line;
-                                    int columna = temp.Span.Location.Column;
+                            if (hijo1.getTipo().Equals(Tipo.Valor.booleano) && hijo2.getTipo().Equals(Tipo.Valor.booleano))
+                            {
+                                nuevoValor = ((Boolean)hijo1.getValor()) ^ ((Boolean)hijo2.getValor());
 
-                                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
-                                        + ". No puede compararse (^) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+                                return new Expresion(Tipo.Valor.booleano, nuevoValor);
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
 
-                                    //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
-                                    //    + ". No puede compararse (^) con la expresion: " + hijo2.getValor().ToString());
-                                    return new Expresion(Tipo.Valor.rnull, null);
-                                }
-                                break;
-                        }
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La expresion: " + hijo1.getValor().ToString()
+                                    + ". No puede compararse (^) con la expresion: " + hijo2.getValor().ToString(), linea, columna));
+
+                                //MessageBox.Show("La expresion: " + hijo1.getValor().ToString()
+                                //    + ". No puede compararse (^) con la expresion: " + hijo2.getValor().ToString());
+                                return new Expresion(Tipo.Valor.rnull, "");
+                            }
+                            break;
+
+                        case ".":
+                            Entorno entorno = null;
+                            try
+                            {
+                                hijo1 = resolverExpresion(temp.ChildNodes.ElementAt(0), ent);
+                            }
+                            catch (Exception e)
+                            {
+                                hijo1 = new Expresion(Tipo.Valor.rnull, "");
+                            }
+
+                            if (hijo1.getTipo().Equals(Tipo.Valor.objeto))
+                            {
+                                entorno = (Entorno)hijo1.getValor();
+                                hijo2 = resolverExpresion(temp.ChildNodes.ElementAt(2), entorno);
+                                return hijo2;
+                            }
+                            else
+                            {
+                                int linea = temp.Span.Location.Line;
+                                int columna = temp.Span.Location.Column;
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,hijo1.getValor().ToString()
+                                    + ". No es una clase ",linea, columna));
+                            }
+                            
+                            break;
                     }
                 }
             }
@@ -785,19 +1208,46 @@ namespace PyUSAC.Analisis
                     {
                         int linea = temp.Span.Location.Line;
                         int columna = temp.Span.Location.Column;
-                        Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], linea, columna);
+                        Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], linea, columna, true);
 
-                        LinkedList<Expresion> l_dim = L_DIM(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);
-                        ArbolArreglo arbolAux = ((ArbolArreglo)sim.getContenido());
+                        if (!temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0).ToString().Equals("RICARDO"))
+                        {
+                            LinkedList<Expresion> l_dim = L_DIM(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);
+                            ArbolArreglo arbolAux = (ArbolArreglo)((Expresion)sim.getContenido()).getValor();
 
-                        return arbolAux.getValor(l_dim, temp.Span.Location.Line, temp.Span.Location.Column);
+                            return arbolAux.getValor(l_dim, temp.Span.Location.Line, temp.Span.Location.Column);
+                        }
+                        else{
+                            ParseTreeNode n = temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0).ChildNodes.ElementAt(1);
+                            LinkedList<NodoArreglo> l_exp = new LinkedList<NodoArreglo>();
+
+                            if (n.ChildNodes.Count != 0)
+                            {
+                                l_exp = L_EXP(n.ChildNodes.ElementAt(0), ent);
+                            }
+
+                            if (sim.getTipo().Equals(Tipo.Simbolo.funcion))
+                            {
+                                Funcion fun = (Funcion)sim.getContenido();
+                                fun.setParametrosFun(l_exp);
+                                fun.Ejecutar(ent);
+                                Expresion exp = fun.getRetorno();
+                                return exp;
+                            }
+                            else
+                            {
+
+                                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
+                                    ". No hay nada que retornar ", linea, columna));
+                            }
+                        }
                     }
                     else//viene solo identificador
                     {
                         int linea = temp.Span.Location.Line;
                         int columna = temp.Span.Location.Column;
 
-                        Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], linea, columna);
+                        Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], linea, columna, true);
 
                         if (sim != null)
                         {
@@ -930,10 +1380,44 @@ namespace PyUSAC.Analisis
 
                             //MessageBox.Show("La expresion: " + hijo2.getValor().ToString()
                             //            + ". No puede negarse");
-                            return new Expresion(Tipo.Valor.rnull, null);
+                            return new Expresion(Tipo.Valor.rnull, "");
                         }
                     }
                 }
+            }
+            else if(temp.ChildNodes.Count == 4)
+            {
+
+                String name = temp.ChildNodes.ElementAt(1).ToString().Split(' ')[0];
+                int linea = temp.Span.Location.Line;
+                int columna = temp.Span.Location.Column;
+                Simbolo sim = ent.search(name, linea, columna, true);
+
+                Expresion exp = new Expresion(Tipo.Valor.rnull, "");
+
+                if (sim != null)
+                {
+                    Clase clase = (Clase)sim.getContenido();
+                    Entorno nuevo = clase.Ejecutar(ent);
+
+                    List<String> names = nuevo.getListKeys();
+                    List<Simbolo> valores = nuevo.getListValues();
+
+                    foreach (Simbolo simTemp in valores)
+                    {
+                        if (simTemp.getTipo().Equals(Tipo.Simbolo.funcion))
+                        {
+                            ((Funcion)simTemp.getContenido()).setExterno(nuevo);
+                        }
+                        else if (simTemp.getTipo().Equals(Tipo.Simbolo.metodo))
+                        {
+                            ((Metodo)simTemp.getContenido()).setExterno(nuevo);
+                        }
+                    }
+
+                    exp = new Expresion(Tipo.Valor.objeto, nuevo);
+                }
+                return exp;
             }
             else if (temp.ChildNodes.Count == 1)
             {
@@ -958,16 +1442,19 @@ namespace PyUSAC.Analisis
                         return new Expresion(Tipo.Valor.booleano, false);
 
                     case "identificador":
-                        Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], 0, 0);
+                        Simbolo sim = ent.search(temp.ChildNodes.ElementAt(0).ToString().Split(' ')[0], 0, 0, true);
 
                         if (sim != null)
                         {
                             return new Expresion(((Expresion)sim.getContenido()).getTipo(), (sim.getContenido() as Expresion).getValor());
                         }
                         break;
+
+                    case "null":
+                        return new Expresion(Tipo.Valor.rnull, "");
                 }
             }
-            return new Expresion(Tipo.Valor.rnull, null);
+            return new Expresion(Tipo.Valor.rnull, "");
         }
 
 

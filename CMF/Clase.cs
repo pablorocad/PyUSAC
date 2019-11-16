@@ -1,4 +1,5 @@
 ﻿using Irony.Parsing;
+using PyUSAC.Analisis;
 using PyUSAC.Clases;
 using PyUSAC.Interfaces;
 using System;
@@ -18,6 +19,24 @@ namespace PyUSAC.CMF
         {
             this.identificador = identificador;
             this.esqueleto = esqueleto;
+        }
+
+        public Entorno Ejecutar(Entorno ent)
+        {
+            Entorno entorno = new Entorno(ent);
+
+            PrimeraPasada primera = new PrimeraPasada();
+            primera.first(esqueleto.ChildNodes.ElementAt(1), entorno);
+
+            SegundaPasada segunda = new SegundaPasada();
+            LinkedList<Instruccion> l_ins = segunda.second(esqueleto.ChildNodes.ElementAt(1), entorno);
+
+            foreach (Instruccion ins in l_ins)
+            {
+                ins.Ejecutar(entorno);
+            }
+
+            return entorno;
         }
 
         public ParseTreeNode getEsqueleto()

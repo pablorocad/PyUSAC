@@ -1,4 +1,5 @@
-﻿using PyUSAC.Clases;
+﻿using PyUSAC.Analisis;
+using PyUSAC.Clases;
 using PyUSAC.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,9 @@ namespace PyUSAC.Instrucciones
 {
     class Break : Instruccion
     {
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
+            return this;
         }
 
         public Tipo.Instruccion getTipo()

@@ -19,7 +19,7 @@ namespace PyUSAC.Instrucciones
             ID = iD;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
             Resolve resolve = new Resolve();
             foreach (Declaracion dec in ID)
@@ -36,7 +36,7 @@ namespace PyUSAC.Instrucciones
                     }
                     else
                     {
-                        Expresion ExpDec = new Expresion(Tipo.Valor.rnull, null);
+                        Expresion ExpDec = new Expresion(Tipo.Valor.rnull, "");
                         sim = new Simbolo(Tipo.Simbolo.variable, ExpDec);
                     }
                 }
@@ -58,10 +58,11 @@ namespace PyUSAC.Instrucciones
                         }
                     }
 
-                    sim = new Simbolo(Tipo.Simbolo.arreglo, arbol);
+                    sim = new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.arreglo, arbol));
                 }
                 ent.add(dec.getIdentificador(), sim, 0, 0);//Guardamos en el entorno
             }
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

@@ -42,7 +42,7 @@ namespace PyUSAC.Clases
             {
                 for (int v = n; v > 0; v--)
                 {
-                    temp.addHijo(new NodoArreglo(new Expresion(Tipo.Valor.rnull, null)));//si no tene hijos, aqui seran los nuevos nodos
+                    temp.addHijo(new NodoArreglo(new Expresion(Tipo.Valor.rnull, "")));//si no tene hijos, aqui seran los nuevos nodos
                 }
             }
         }
@@ -83,7 +83,7 @@ namespace PyUSAC.Clases
                     return getValor(posicion, temp.getHijo(num), v + 1, fila, columna);
                 }
                 Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "Indice fuera de los limites", fila, columna));
-                return new Expresion(Tipo.Valor.rnull, null);
+                return new Expresion(Tipo.Valor.rnull, "");
             }
             return temp.getValor();
         }

@@ -12,12 +12,40 @@ namespace PyUSAC.Clases
     {
 
         public Dictionary<String, Simbolo> tabla;
+        public LinkedList<Entorno> import;
         Entorno anterior;
 
         public Entorno(Entorno ant)
         {
             anterior = ant;
             tabla = new Dictionary<string, Simbolo>();
+            import = new LinkedList<Entorno>();
+            tabla.Add("null", new Simbolo(Tipo.Simbolo.variable, new Expresion(Tipo.Valor.rnull, "")));
+        }
+
+        public bool addImport(Entorno ent, Boolean h)
+        {
+            if (h)
+            {
+                import.AddLast(ent);
+            }
+            else
+            {
+                import.AddFirst(ent);
+            }
+            return true;
+        }
+
+        public List<Simbolo> getListValues()
+        {
+            List<Simbolo> lista = tabla.Values.ToList();
+            return lista;
+        }
+
+        public List<String> getListKeys()
+        {
+            List<String> lista = tabla.Keys.ToList();
+            return lista;
         }
 
         public bool add(String name, Simbolo valor, int fila, int columna)
@@ -56,7 +84,7 @@ namespace PyUSAC.Clases
             }
         }
 
-        public Simbolo search(String name, int fila, int columna)
+        public Simbolo search(String name, int fila, int columna, Boolean h)
         {
             /*comienza en el mismo y mientras sea diferente de nulo va hacia atras 
             hasta que encuentre la variable mas cercana*/
@@ -67,9 +95,13 @@ namespace PyUSAC.Clases
                     return en.tabla[name.ToLower()];
                 }
             }
-            Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
+
+            if (h)
+            {
+                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico,
                 "La variable " + name + " no existe", fila, columna));
-            //MessageBox.Show("La variable " + name + " no esxiste");
+                //MessageBox.Show("La variable " + name + " no esxiste");
+            }
             return null;
         }
 

@@ -30,6 +30,7 @@ namespace PyUSAC.Analisis
             #region Terminales
             //Palabras reservadas--------------------------------------------------------
             var rvar = ToTerm("var");
+            var rnull = ToTerm("null");
             var rtrue = ToTerm("true");
             var rfalse = ToTerm("false");
             var rlog = ToTerm("log");
@@ -49,9 +50,11 @@ namespace PyUSAC.Analisis
             var rfunction = ToTerm("function");
             var rvoid = ToTerm("void");
             var rreturn = ToTerm("return");
+            var rnew = ToTerm("new");
 
             //Simbolos-------------------------------------------------------------------
             var igual = ToTerm("=");
+            var punto = ToTerm(".");
             var puntocoma = ToTerm(";");
             var coma = ToTerm(",");
             var mas = ToTerm("+");
@@ -91,6 +94,7 @@ namespace PyUSAC.Analisis
             RegisterOperators(8, potencia);
             RegisterOperators(9, Associativity.Right, not);
             RegisterOperators(10, Associativity.Right, aumento, decremento);
+            RegisterOperators(11, punto);
             #endregion
 
             #region No Terminales
@@ -101,18 +105,14 @@ namespace PyUSAC.Analisis
                 INS = new NonTerminal("INS"),
                 INSB = new NonTerminal("INSB"),
                 L_INSB = new NonTerminal("L_INSB"),
-
-                BLOQUE_CL = new NonTerminal("BLOQUE_CL"),
-                L_INS_CL = new NonTerminal("L_INS_CL"),
-                INS_CL = new NonTerminal("INS_CL"),
-
-                BLOQUE_MET = new NonTerminal("BLOQUE_MET"),
-                L_INS_MET = new NonTerminal("L_INS_MET"),
-                INS_MET = new NonTerminal("INS_MET"),
                 RETURN = new NonTerminal("RETURN"),
+                LLAMADA = new NonTerminal("LLAMADA"),
+                LLAMADAP = new NonTerminal("LLAMADP"),
 
                 DECLARACION = new NonTerminal("DECLARACION"),
                 L_DIM = new NonTerminal("L_DIM"),
+                RICARDO = new NonTerminal("RICARDO"),
+                MILOS = new NonTerminal("MILOS"),
                 VAL_ARR = new NonTerminal("VAL_ARR"),
                 VAL_ARR2 = new NonTerminal("VAL_ARR2"),
                 L_EXP = new NonTerminal("L_EXP"),
@@ -139,6 +139,8 @@ namespace PyUSAC.Analisis
                 FUNCION = new NonTerminal("FUNCION"),
                 L_PAR = new NonTerminal("L_PAR"),
                 L_PARR = new NonTerminal("L_PARR"),
+
+                L_ID_AS = new NonTerminal("L_ID_AS"),
 
                 BLOQUE = new NonTerminal("BLOQUE"),
                 
@@ -176,6 +178,7 @@ namespace PyUSAC.Analisis
                       | CLASE
                       | METODO
                       | FUNCION
+                      | LLAMADA
                 ;
 
             L_INSB.Rule = L_INSB + INSB
@@ -199,6 +202,7 @@ namespace PyUSAC.Analisis
                       | FUNCION
                       | METODO
                       | RETURN
+                      | LLAMADA
                 ;
 
             DECLARACION.Rule = rvar + L_ID + puntocoma
@@ -214,12 +218,27 @@ namespace PyUSAC.Analisis
                     ;
 
             ZI2.Rule = L_DIM
+                     | RICARDO
                      | Empty
                      ;
 
             L_DIM.Rule = L_DIM + corcheteizq + E + corcheteder
                         | corcheteizq + E + corcheteder
                 ;
+
+            RICARDO.Rule = parizq + MILOS + parder
+                ;
+
+            MILOS.Rule = L_EXP 
+                        | Empty
+                ;
+
+            LLAMADA.Rule = LLAMADAP + RICARDO + puntocoma
+                ;
+
+            LLAMADAP.Rule = LLAMADAP + punto + LLAMADAP
+                        | identificador
+                        ;
 
             VAL_ARR.Rule = igual + VAL_ARR2
                          |Empty
@@ -240,7 +259,7 @@ namespace PyUSAC.Analisis
             ALERT.Rule = ralert + parizq + E + parder + puntocoma
                 ;
 
-            ASIGNACION.Rule = identificador + ZI2 + igual + E + puntocoma
+            ASIGNACION.Rule = LLAMADAP + ZI2 + igual + E + puntocoma
                 ;
 
             GRAPH.Rule = rgraph + parizq + E + coma + E + parder + puntocoma
@@ -325,11 +344,12 @@ namespace PyUSAC.Analisis
                     | E + menorigual + E
                     | E + igualigual + E
                     | E + desigual + E
+                    | E + punto + E
                     | E + or + E
                     | E + and + E
                     | E + xor + E
-                    |E + aumento
-                    |E + decremento
+                    | E + aumento
+                    | E + decremento
                     | not + E
                     | parizq + E + parder
                     | menos + E
@@ -339,6 +359,8 @@ namespace PyUSAC.Analisis
                     | caracter
                     | rtrue
                     | rfalse
+                    | rnull
+                    | rnew + identificador + parizq + parder
                     ;
             #endregion
 

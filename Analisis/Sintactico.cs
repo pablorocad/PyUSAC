@@ -11,6 +11,7 @@ using PyUSAC.Clases;
 using PyUSAC.Interfaces;
 using System.Windows.Forms;
 using PyUSAC.Instrucciones;
+using PyUSAC.CMF;
 
 namespace PyUSAC.Analisis
 {
@@ -20,9 +21,6 @@ namespace PyUSAC.Analisis
         LinkedList<Instruccion> listaIns;
         public static LinkedList<String> listaImp;
         Resolve resolve = new Resolve();
-
-        public static Stack<Instruccion> pilaBreak = new Stack<Instruccion>();
-        public static Stack<Instruccion> pilaContinue = new Stack<Instruccion>();
 
         public Sintactico()
         {
@@ -125,11 +123,28 @@ namespace PyUSAC.Analisis
 
             SegundaPasada segunda = new SegundaPasada();
             listaIns = segunda.second(temp, global);
+            global.addImport(global, false);
+
+            List<String> names = global.getListKeys();
+            List<Simbolo> valores = global.getListValues();
+
+            foreach (Simbolo simTemp in valores)
+            {
+                if (simTemp.getTipo().Equals(Tipo.Simbolo.funcion))
+                {
+                    ((Funcion)simTemp.getContenido()).setExterno(global);
+                }
+                else if (simTemp.getTipo().Equals(Tipo.Simbolo.metodo))
+                {
+                    ((Metodo)simTemp.getContenido()).setExterno(global);
+                }
+            }
 
             foreach (Instruccion lista in listaIns)
             {
                 lista.Ejecutar(global);
             }
+            //Console.WriteLine();//ARREGLAR LLAMADA A METODOS, FUNCIONES
 
         }
 

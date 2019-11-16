@@ -23,48 +23,52 @@ namespace PyUSAC.Instrucciones
             rdefault = def;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
-            Sintactico.pilaBreak.Push(this);
 
             Resolve resolve = new Resolve();
             Boolean z = true;
             Expresion cond = resolve.resolverExpresion(entrada, ent);//Resolvemos la condicion
+            Instruccion ins;
 
-            if (!cond.getTipo().Equals(Tipo.Valor.rnull))
+            foreach (Case cs in listaCasos)
             {
-                foreach (Case cs in listaCasos)
+
+                Expresion expCs = resolve.resolverExpresion(cs.getCondicion(), ent);//Resolvemos la condicion
+
+                if (cond.getValor().ToString().ToLower().Equals(expCs.getValor().ToString().ToLower()))
                 {
+                    z = false;
+                    ins = cs.getBloque().Ejecutar(ent);
 
-                    if (Sintactico.pilaBreak.Count == 0 || !Sintactico.pilaBreak.Peek().Equals(this))
+                    if (ins != null)
                     {
-                        break;
-                    }
-
-                    Expresion expCs = resolve.resolverExpresion(cs.getCondicion(), ent);//Resolvemos la condicion
-
-                    if (cond.getValor().ToString().ToLower().Equals(expCs.getValor().ToString().ToLower()))
-                    {
-                        z = false;
-                        cs.getBloque().Ejecutar(ent);
-
-                        cond = resolve.resolverExpresion(entrada, ent);
-                        if (cond.getTipo().Equals(Tipo.Valor.rnull))
+                        if (ins.getTipo().Equals(Tipo.Instruccion.Break))
                         {
-                            cond = new Expresion(Tipo.Valor.booleano, "");
+                            break;
+                        }
+                        else if (ins.getTipo().Equals(Tipo.Instruccion.Continue))
+                        {
+                            cond = resolve.resolverExpresion(entrada, ent);
+                        }
+                        else if (ins.getTipo().Equals(Tipo.Instruccion.Return))
+                        {
+                            return ins;
                         }
                     }
+                    else
+                    {
+                        cond = resolve.resolverExpresion(entrada, ent);
+                    }
                 }
+            }
 
-                if (z && rdefault != null)
-                {
-                    rdefault.Ejecutar(ent);
-                }
-            }
-            if (Sintactico.pilaBreak.Count != 0 && Sintactico.pilaBreak.Peek().Equals(this))
+            if (z && rdefault != null)
             {
-                Sintactico.pilaBreak.Pop();
+                rdefault.Ejecutar(ent);
             }
+
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

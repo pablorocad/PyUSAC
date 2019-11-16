@@ -12,11 +12,11 @@ namespace PyUSAC.Clases
 
         public enum Simbolo
         {
-            variable, arreglo, clase, metodo, funcion
+            variable, clase, metodo, funcion
         };
         public enum Valor
         {
-            numero, cadena, identificador, caracter, booleano, rnull
+            numero, cadena, identificador, caracter, booleano, rnull, arreglo, objeto
         };
 
         public enum Error
@@ -27,7 +27,7 @@ namespace PyUSAC.Clases
         public enum Instruccion
         {
             declaracion, log, alert, graph, If, While, For, Do_While, Switch, Bloque, asignacion,
-            Break, Continue
+            Break, Continue, llamada, Return
         };
 
     }

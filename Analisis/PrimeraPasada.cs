@@ -36,23 +36,23 @@ namespace PyUSAC.Analisis
                         Bloques dec = bloques(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);//Guardamos la instrucciones
                         if (dec != null)//Para excluir declaracion y asignacion
                         {
-                            String name = "";
-                            Tipo.Simbolo t = dec.getTipo();
+                            String name = dec.getName();
+                            //Tipo.Simbolo t = dec.getTipo();
 
-                            switch (t)
-                            {
-                                case Tipo.Simbolo.clase:
-                                    name = "@" + dec.getName();
-                                    break;
+                            //switch (t)
+                            //{
+                            //    case Tipo.Simbolo.clase:
+                            //        name = "@" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.funcion:
-                                    name = "#" + dec.getName();
-                                    break;
+                            //    case Tipo.Simbolo.funcion:
+                            //        name = "#" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.metodo:
-                                    name = "%" + dec.getName();
-                                    break;
-                            }
+                            //    case Tipo.Simbolo.metodo:
+                            //        name = "%" + dec.getName();
+                            //        break;
+                            //}
 
                             Simbolo sim = new Simbolo(dec.getTipo(), dec);
 
@@ -66,23 +66,23 @@ namespace PyUSAC.Analisis
 
                         if (dec != null)//Para excluir declaracion y asignacion
                         {
-                            String name = "";
+                            String name = dec.getName();
                             Tipo.Simbolo t = dec.getTipo();
 
-                            switch (t)
-                            {
-                                case Tipo.Simbolo.clase:
-                                    name = "@" + dec.getName();
-                                    break;
+                            //switch (t)
+                            //{
+                            //    case Tipo.Simbolo.clase:
+                            //        name = "@" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.funcion:
-                                    name = "#" + dec.getName();
-                                    break;
+                            //    case Tipo.Simbolo.funcion:
+                            //        name = "#" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.metodo:
-                                    name = "%" + dec.getName();
-                                    break;
-                            }
+                            //    case Tipo.Simbolo.metodo:
+                            //        name = "%" + dec.getName();
+                            //        break;
+                            //}
 
                             Simbolo sim = new Simbolo(dec.getTipo(), dec);
 
@@ -101,23 +101,23 @@ namespace PyUSAC.Analisis
                         Bloques dec = bloques(temp.ChildNodes.ElementAt(1).ChildNodes.ElementAt(0), ent);//Guardamos la instrucciones
                         if (dec != null)//Para excluir declaracion y asignacion
                         {
-                            String name = "";
+                            String name = dec.getName();
                             Tipo.Simbolo t = dec.getTipo();
 
-                            switch (t)
-                            {
-                                case Tipo.Simbolo.clase:
-                                    name = "@" + dec.getName();
-                                    break;
+                            //switch (t)
+                            //{
+                            //    case Tipo.Simbolo.clase:
+                            //        name = "@" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.funcion:
-                                    name = "#" + dec.getName();
-                                    break;
+                            //    case Tipo.Simbolo.funcion:
+                            //        name = "#" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.metodo:
-                                    name = "%" + dec.getName();
-                                    break;
-                            }
+                            //    case Tipo.Simbolo.metodo:
+                            //        name = "%" + dec.getName();
+                            //        break;
+                            //}
 
                             Simbolo sim = new Simbolo(dec.getTipo(), dec);
 
@@ -131,23 +131,23 @@ namespace PyUSAC.Analisis
 
                         if (dec != null)//Para excluir declaracion y asignacion
                         {
-                            String name = "";
+                            String name = dec.getName();
                             Tipo.Simbolo t = dec.getTipo();
 
-                            switch (t)
-                            {
-                                case Tipo.Simbolo.clase:
-                                    name = "@" + dec.getName();
-                                    break;
+                            //switch (t)
+                            //{
+                            //    case Tipo.Simbolo.clase:
+                            //        name = "@" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.funcion:
-                                    name = "#" + dec.getName();
-                                    break;
+                            //    case Tipo.Simbolo.funcion:
+                            //        name = "%" + dec.getName();
+                            //        break;
 
-                                case Tipo.Simbolo.metodo:
-                                    name = "%" + dec.getName();
-                                    break;
-                            }
+                            //    case Tipo.Simbolo.metodo:
+                            //        name = "%" + dec.getName();
+                            //        break;
+                            //}
 
                             Simbolo sim = new Simbolo(dec.getTipo(), dec);
 
@@ -174,7 +174,7 @@ namespace PyUSAC.Analisis
                     String idMET = temp.ChildNodes.ElementAt(2).ToString().Split(' ')[0];
                     ParseTreeNode esqueletoMET = temp.ChildNodes.ElementAt(6);
 
-                    LinkedList<Declaracion> l_parMET = L_PARR(temp.ChildNodes.ElementAt(4), ent);
+                    LinkedList<String> l_parMET = L_PARR(temp.ChildNodes.ElementAt(4), ent);
 
                     return new Metodo(idMET, l_parMET, esqueletoMET);
 
@@ -182,19 +182,19 @@ namespace PyUSAC.Analisis
                     String idFUN = temp.ChildNodes.ElementAt(1).ToString().Split(' ')[0];
                     ParseTreeNode esqueletoFUN = temp.ChildNodes.ElementAt(5);
 
-                    LinkedList<Declaracion> l_parFUN = L_PARR(temp.ChildNodes.ElementAt(3), ent);
+                    LinkedList<String> l_parFUN = L_PARR(temp.ChildNodes.ElementAt(3), ent);
 
                     return new Funcion(idFUN, l_parFUN, esqueletoFUN);
             }
             return bloque;
         }
 
-        public LinkedList<Declaracion> L_PARR(ParseTreeNode temp, Entorno ent)
+        public LinkedList<String> L_PARR(ParseTreeNode temp, Entorno ent)
         {
-            LinkedList<Declaracion> l_par = null;
+            LinkedList<String> l_par = null;
             if (temp.ChildNodes.Count == 0)
             {
-                l_par = new LinkedList<Declaracion>();
+                l_par = new LinkedList<String>();
             }
             else
             {
@@ -203,25 +203,23 @@ namespace PyUSAC.Analisis
             return l_par;
         }
 
-        public LinkedList<Declaracion> L_PAR(ParseTreeNode temp, Entorno ent)
+        public LinkedList<String> L_PAR(ParseTreeNode temp, Entorno ent)
         {
-            LinkedList<Declaracion> l_par = null;
+            LinkedList<String> l_par = null;
             
             if (temp.ChildNodes.Count == 4)
             {
                 l_par = L_PAR(temp.ChildNodes.ElementAt(0), ent);
                 String name = temp.ChildNodes.ElementAt(3).ToString().Split(' ')[0];
-                Declaracion dec = new Declaracion(name, null);
 
-                l_par.AddLast(dec);
+                l_par.AddLast(name);
             }
             else if (temp.ChildNodes.Count == 2)
             {
-                l_par = new LinkedList<Declaracion>();
+                l_par = new LinkedList<String>();
                 String name = temp.ChildNodes.ElementAt(1).ToString().Split(' ')[0];
-                Declaracion dec = new Declaracion(name, null);
 
-                l_par.AddLast(dec);
+                l_par.AddLast(name);
             }
             return l_par;
         }

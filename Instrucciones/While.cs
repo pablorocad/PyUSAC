@@ -22,49 +22,48 @@ namespace PyUSAC.Instrucciones
             this.bloque = bloque;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
-
-            Sintactico.pilaBreak.Push(this);
 
             Resolve resolve = new Resolve();
             Expresion cond = resolve.resolverExpresion(condicion, ent);
+            Instruccion ins;
 
-            if (!cond.getTipo().Equals(Tipo.Valor.rnull))
+            if (cond.getTipo().Equals(Tipo.Valor.booleano))
             {
-                if (cond.getTipo().Equals(Tipo.Valor.booleano))
+                while (cond.getValor().ToString().ToLower().Equals("true"))
                 {
-                    while (cond.getValor().ToString().ToLower().Equals("true"))
-                    {
 
-                        if (Sintactico.pilaBreak.Count == 0 || !Sintactico.pilaBreak.Peek().Equals(this))
+                    ins = bloque.Ejecutar(ent);
+                    if (ins != null)
+                    {
+                        if (ins.getTipo().Equals(Tipo.Instruccion.Break))
                         {
                             break;
                         }
-
-                        //Entorno entAux = new Entorno(ent);
-                        bloque.Ejecutar(ent);
-                        cond = resolve.resolverExpresion(condicion, ent);
-
-                        if (cond.getTipo().Equals(Tipo.Valor.rnull))
+                        else if (ins.getTipo().Equals(Tipo.Instruccion.Continue))
                         {
-                            cond = new Expresion(Tipo.Valor.booleano, false);
+                            break;
                         }
-
-                      
+                        else if (ins.getTipo().Equals(Tipo.Instruccion.Return))
+                        {
+                            return ins;
+                        }
                     }
-                }
-                else
-                {
-                    int linea = condicion.Span.Location.Line;
-                    int columna = condicion.Span.Location.Column;
-                    Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La Expresion debe ser booleana", linea, columna));
+                    else
+                    {
+                        cond = resolve.resolverExpresion(condicion, ent);
+                    }                  
                 }
             }
-            if (Sintactico.pilaBreak.Count != 0 && Sintactico.pilaBreak.Peek().Equals(this))
+            else
             {
-                Sintactico.pilaBreak.Pop();
+                int linea = condicion.Span.Location.Line;
+                int columna = condicion.Span.Location.Column;
+                Sintactico.listaErrores.Add(new Error(Tipo.Error.semantico, "La Expresion debe ser booleana", linea, columna));
             }
+           
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

@@ -28,44 +28,45 @@ namespace PyUSAC.Instrucciones
             this.bloque = bloque;
         }
 
-        public void Ejecutar(Entorno ent)
+        public Instruccion Ejecutar(Entorno ent)
         {
-            Sintactico.pilaBreak.Push(this);//Indicamos que estamos ejecutando
-
             Resolve resolve = new Resolve();
             SegundaPasada second = new SegundaPasada();
 
             Instruccion ins;
-            ins = second.instructions(inicilizacion, entornoFor);
+            ins = second.instructions(inicilizacion, entornoFor);//Resolvemos la variable de inicio
             ins.Ejecutar(entornoFor);
 
             Expresion cond = resolve.resolverExpresion(condicion, entornoFor);//Resolvemos condicion
 
-            if (!cond.getTipo().Equals(Tipo.Valor.rnull))
-            {
-                while (cond.getValor().ToString().ToLower().Equals("true"))
-                {//Mientras la condicion se cumpla ejecutaremos el bloque
-                    //Entorno entAux = new Entorno(entornoFor);
-                    if (Sintactico.pilaBreak.Count == 0 || !Sintactico.pilaBreak.Peek().Equals(this))
+            
+             while (cond.getValor().ToString().ToLower().Equals("true"))
+             {//Mientras la condicion se cumpla ejecutaremos el bloque
+                     ins = bloque.Ejecutar(entornoFor);
+
+                if (ins != null)
+                {
+                    if (ins.getTipo().Equals(Tipo.Instruccion.Break))
                     {
-                        break;//Si ya no se encuentra la instruccion es porque hubo un break
+                        break;
                     }
-
-                    bloque.Ejecutar(entornoFor);
-                    resolve.resolverExpresion(actualizacion, entornoFor);//actualizar
-                    cond = resolve.resolverExpresion(condicion, entornoFor);
-
-                    if (cond.getTipo().Equals(Tipo.Valor.rnull))
+                    else if (ins.getTipo().Equals(Tipo.Instruccion.Continue))
                     {
-                        cond = new Expresion(Tipo.Valor.booleano, false);
+                        resolve.resolverExpresion(actualizacion, entornoFor);//actualizar
+                        cond = resolve.resolverExpresion(condicion, entornoFor);
+                    }
+                    else if (ins.getTipo().Equals(Tipo.Instruccion.Return))
+                    {
+                        return ins;
                     }
                 }
-            }
-
-            if (Sintactico.pilaBreak.Count != 0 && Sintactico.pilaBreak.Peek().Equals(this))
-            {
-                Sintactico.pilaBreak.Pop();//Si termino la interacion sin break, indicamos que salimos
-            }
+                else
+                {
+                    resolve.resolverExpresion(actualizacion, entornoFor);//actualizar
+                    cond = resolve.resolverExpresion(condicion, entornoFor);
+                }
+             }
+            return null;
         }
 
         public Tipo.Instruccion getTipo()

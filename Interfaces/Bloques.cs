@@ -13,8 +13,8 @@ namespace PyUSAC.Interfaces
 
         ParseTreeNode getEsqueleto();
         String getName();
-
         Tipo.Simbolo getTipo();
 
+        Entorno Ejecutar(Entorno ent);
     }
 }
